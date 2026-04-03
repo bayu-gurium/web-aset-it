@@ -77,7 +77,7 @@ if (isset($_POST['login'])) {
 
                                 <div class="mb-4">
                                     <!-- <label for="username" class="form-label">Username</label> -->
-                                    <input type="text" name="username" class="form-control p-2 px-3 bg-light" id="username" placeholder="Username" required>
+                                    <input type="text" name="username" class="form-control p-2 px-3" id="username" placeholder="Username" required>
                                 </div>
                                 <div class="mb-4">
                                     <!-- <label for="password" class="form-label">Password</label> -->
