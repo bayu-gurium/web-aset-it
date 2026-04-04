@@ -8,6 +8,21 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] !== true) {
     exit;
 }
 
+// query tampilkan data Lokasi dan Kategori
+$data_lokasi = allData("SELECT * FROM lokasi");
+$data_kategori = allData("SELECT * FROM kategori");
+
+// cek aksi pada tombol simpan
+if (isset($_POST['simpan_pendataan'])) {
+
+    if (tambahDataPendataan($_POST) > 0) {
+        $sukses = true;
+    } else {
+        echo  mysqli_error($db_connect);
+    }
+}
+
+
 ?>
 
 
@@ -28,6 +43,8 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] !== true) {
     <!-- link css -->
     <link rel="stylesheet" href="css/style.css">
 </head>
+
+
 
 <body>
     <div class="container px-5 fixed-top">
@@ -95,6 +112,7 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] !== true) {
         <!-- navbar end -->
     </div>
 
+
     <!-- main content -->
     <div class="container px-5 main-content">
         <div class="row justify-content-center mt-4 mb-3">
@@ -122,17 +140,17 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] !== true) {
             <div class="col-lg-8">
                 <div class="row my-1">
                     <div class="col-lg text-end fw-lighter">
-                        <button class="btn btn-sm text-light" style="background-color: #3a4ccb;" type="button" data-bs-toggle="modal" data-bs-target="#modalTambahAset"> <i class="bi bi-plus-circle"></i> Tambah Aset</button>
+                        <button class="btn btn-sm text-light mb-2" style="background-color: #3a4ccb;" type="button" data-bs-toggle="modal" data-bs-target="#modalTambahAset"> <i class="bi bi-plus-circle"></i> Tambah Aset</button>
                         <!-- Modal Tambah Pendtaan Aset -->
                         <div class="modal fade text-start fw-normal" id="modalTambahAset" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalTambahAsetLabel" aria-hidden="true">
                             <div class="modal-dialog modal-xl">
-                                <form action="">
+                                <form action="" method="post" enctype="multipart/form-data">
                                     <div class="modal-content border-0">
                                         <div class="modal-header px-5 text-light" style="background-color: #3a4ccb;">
                                             <h1 class="modal-title fs-5 mx-4" id="modalTambahAsetLabel">Tambah Data Aset Baru</h1>
                                             <button type="button" class="btn ms-auto border-0 fs-5" data-bs-dismiss="modal" aria-label="close"><i class="bi bi-x-lg text-light"></i></button>
                                         </div>
-                                        <div class="modal-body">
+                                        <div class="modal-body fw-light">
                                             <div class="row justify-content-center">
                                                 <!-- col 1 -->
                                                 <div class="col-md-8">
@@ -141,23 +159,25 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] !== true) {
                                                         <div class="col-md-5">
                                                             <div class="mb-3">
                                                                 <label for="nama-aset" class="form-label">Nama Aset</label>
-                                                                <input type="text" class="form-control " name="nama-aset" id="nama-aset" placeholder="Nama Aset">
+
+                                                                <input type="text" value="AST-1" name="kode_aset">
+                                                                <input type="text" class="form-control" name="nama_aset" id="nama-aset" placeholder="Masukkan Nama Aset">
                                                             </div>
                                                             <div class="mb-3">
                                                                 <label for="lokasi" class="form-label">Lokasi</label>
-                                                                <select class="form-select form-select mb-3" name="lokasi">
-                                                                    <option selected> Pilih Lokasi </option>
-                                                                    <option value="1">Teller</option>
-                                                                    <option value="2">Operator</option>
-                                                                    <option value="3">Gudang</option>
+                                                                <select class="form-select form-select mb-3" name="id_lokasi">
+                                                                    <option class="fw-light"> Pilih Lokasi </option>
+                                                                    <?php foreach ($data_lokasi as $lokasi) : ?>
+                                                                        <option value=" <?= $lokasi['id_lokasi'] ?> "><?= $lokasi['nama_lokasi'] ?></option>
+                                                                    <?php endforeach ?>
                                                                 </select>
                                                             </div>
                                                             <div class="mb-3">
                                                                 <label for="kondisi" class="form-label">Kondisi</label>
                                                                 <select class="form-select form-select mb-3" name="kondisi">
-                                                                    <option value="1">Baik</option>
-                                                                    <option value="2">Rusak Ringan</option>
-                                                                    <option value="3">Rusak Berat</option>
+                                                                    <option value="Baik">Baik</option>
+                                                                    <option value="Rusak Ringan">Rusak Ringan</option>
+                                                                    <option value="Rusak Berat">Rusak Berat</option>
                                                                 </select>
                                                             </div>
                                                         </div>
@@ -165,23 +185,23 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] !== true) {
                                                         <div class="col-md-5">
                                                             <div class="mb-3">
                                                                 <label for="katgory" class="form-label">Kategori Aset</label>
-                                                                <select class="form-select form-select mb-3" name="kategory">
-                                                                    <option selected> Pilih Kategori </option>
-                                                                    <option value="1">Leptop</option>
-                                                                    <option value="2">Printer</option>
-                                                                    <option value="3">Wifi</option>
+                                                                <select class="form-select form-select mb-3" name="id_kategori">
+                                                                    <option class="fw-light"> Pilih Kategori </option>
+                                                                    <?php foreach ($data_kategori as $kategori) : ?>
+                                                                        <option value="<?= $kategori['id_kategori'] ?>"><?= $kategori['nama_kategori']  ?></option>
+                                                                    <?php endforeach ?>
                                                                 </select>
                                                             </div>
                                                             <div class="mb-3">
                                                                 <label for="tgl" class="form-label">Tanggal Perolehan</label>
-                                                                <input type="date" class="form-control" id="tgl" name="tgl">
+                                                                <input type="date" class="form-control" id="tgl" name="tgl_perolehan">
                                                             </div>
                                                             <div class="mb-3">
                                                                 <label for="status" class="form-label">Status</label>
                                                                 <select class="form-select form-select mb-3" name="status">
-                                                                    <option value="1">Aktif</option>
-                                                                    <option value="2">Cadangan</option>
-                                                                    <option value="3">Dihapuskan</option>
+                                                                    <option value="Aktif">Aktif</option>
+                                                                    <option value="Cadangan">Cadangan</option>
+                                                                    <option value="Dihapuskan">Dihapuskan</option>
                                                                 </select>
                                                             </div>
                                                         </div>
@@ -210,15 +230,15 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] !== true) {
                                                         <div class="field ">
                                                             <div class="row px-2">
                                                                 <div class="col-md px-4">
-                                                                    <input type="file" class="form-control form-control" aria-describedby="ket">
+                                                                    <input type="file" class="form-control form-control" aria-describedby="ket" name="foto_aset">
                                                                     <div class="form-text" id="ket">* Ukuran Foto Max 500MB</div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="modal-footer text-center">
-                                                        <button type="submit" class="btn text-light" style="background-color: #14Ae5c;"><i class="bi bi-floppy me-2"></i> Simpan</button>
-                                                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Batal</button>
+                                                        <button type="submit" class="btn text-light" name="simpan_pendataan" style="background-color: #14Ae5c;"><i class="bi bi-floppy me-2"></i> Simpan</button>
+                                                        <button type="submit" class="btn btn-danger" data-bs-dismiss="modal">Batal</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -230,18 +250,28 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] !== true) {
                         <!-- Modal end -->
                     </div>
                 </div>
+                <?php if (isset($sukses)) : ?>
+                    <div class="alert alert-success p-2 px-2 border-0">
+                        <small>Data Aset Baru berhasil Ditambahkan</small>
+                    </div>
+                <?php endif ?>
+                <?php if (isset($error)) : ?>
+                    <div class="alert alert-danger p-2 px-2 border-0">
+                        <small>Data Aset Gagal Ditambahkan!!</small>
+                    </div>
+                <?php endif ?>
                 <!-- table -->
                 <div class="table-responsive">
-                    <table class="table table-sm table-borderless table-striped fw-light">
+                    <table class="table table-borderless table-striped fw-light">
                         <thead class="text-center border-bottom border-top">
                             <tr>
-                                <th class="th-1">NO</th>
-                                <th class="th-1">KODE ASET</th>
-                                <th class="th-1">NAMA ASET</th>
-                                <th class="th-1">KATEGORI</th>
-                                <th class="th-1">LOKASI</th>
-                                <th class="th-1">KONDISI</th>
-                                <th class="th-1"><i class="bi bi-pencil-square"></i></th>
+                                <th class="fs-6">NO</th>
+                                <th class="fs-6">KODE ASET</th>
+                                <th class="fs-6">NAMA ASET</th>
+                                <th class="fs-6">KATEGORI</th>
+                                <th class="fs-6">LOKASI</th>
+                                <th class="fs-6">KONDISI</th>
+                                <th class="fs-6"><i class="bi bi-pencil-square"></i></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -256,7 +286,6 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] !== true) {
                                     <a href="" style="color: #14Ae5c;"><i class="bi bi-pencil-fill me-3"></i></a>
                                     <a href="" style="color: #f24822;"><i class="bi bi-trash3 me-3"></i></a>
                                     <a href="" style="color: #2b32b2;"><i class="bi bi-eye me-3"></i></a>
-
                                 </td>
                             </tr>
                             <tr>

@@ -83,3 +83,30 @@ function hapusKategori($id_kategori)
     return mysqli_affected_rows($db_connect);
 }
 // -----------------------------------
+
+// Tambah PENDATAAN
+function tambahDataPendataan($data)
+{
+
+    global $db_connect;
+
+    // get data form
+    $kode_aset = $data['kode_aset'];
+    $nama_aset = $data['nama_aset'];
+    $id_kategori = $data['id_kategori'];
+    $spesifikasi = $data['spesifikasi'];
+    $id_lokasi = $data['id_lokasi'];
+    $kondisi = $data['kondisi'];
+    $status = $data['status'];
+    $tgl_perolehan = $data['tgl_perolehan'];
+    $keterangan = $data['keterangan'];
+    $foto_aset = "default.jpg";
+
+    var_dump($kode_aset, $nama_aset, $id_kategori, $spesifikasi, $id_lokasi, $kondisi, $status, $tgl_perolehan, $keterangan, $foto_aset);
+    die;
+
+
+    return mysqli_affected_rows($db_connect);
+}
+
+// -----------------------------------
