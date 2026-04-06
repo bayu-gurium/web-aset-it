@@ -165,6 +165,47 @@ function uploadFotoAset()
     }
 }
 
+// Fungsi Edit/Update Data Aset
+function updateDaatAset($data)
+{
+    global $db_connect;
+
+    // get data form
+    $kode_aset = htmlspecialchars($data['kode_aset']);
+    $nama_aset = htmlspecialchars($data['nama_aset']);
+    $id_kategori = $data['id_kategori'];
+    $spesifikasi = htmlspecialchars($data['spesifikasi']);
+    $id_lokasi = $data['id_lokasi'];
+    $kondisi = $data['kondisi'];
+    $status = $data['status'];
+    $tgl_perolehan = $data['tgl_perolehan'];
+    $keterangan = htmlspecialchars($data['keterangan']);
+    $id_aset = $data['id_aset'];
+    $old_foto = $data['old_foto'];
+
+    if ($_FILES['foto_aset']['error'] == 4) {
+        $foto_aset = $old_foto;
+    } else {
+
+        $foto_aset = uploadFotoAset();
+    }
+
+    $query_data =  "UPDATE aset SET
+                                    kode_aset = '$kode_aset',
+                                    nama_aset = '$nama_aset',
+                                    id_kategori = '$id_kategori',
+                                    spesifikasi = '$spesifikasi',
+                                    id_lokasi = '$id_lokasi',
+                                    kondisi = '$kondisi',
+                                    status = '$status',
+                                    tgl_perolehan = '$tgl_perolehan',
+                                    keterangan = '$keterangan',
+                                    foto_aset = '$foto_aset' WHERE id_aset = $id_aset";
+    mysqli_query($db_connect, $query_data);
+
+    return mysqli_affected_rows($db_connect);
+}
+
 // Fungsi Hapus Data Aset
 function hapusAset($id_aset)
 {

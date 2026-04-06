@@ -22,9 +22,18 @@ if (isset($_POST['simpan_pendataan'])) {
     }
 }
 
-// query JOIN Data Kategori dan Lokasi dengan data Aset
-$data_aset = allData("SELECT * FROM aset JOIN kategori ON aset.id_kategori = kategori.id_kategori JOIN lokasi ON aset.id_lokasi = lokasi.id_lokasi");
+// cek tombol update  Simpan ditekan
+if (isset($_POST['update_pendataan'])) {
 
+    if (updateDaatAset($_POST) > 0) {
+        $sukses_update = true;
+    } else {
+        echo mysqli_error($db_connect);
+    }
+}
+
+// query JOIN Data Kategori dan Lokasi dengan data Aset
+$data_aset = allData("SELECT * FROM aset JOIN kategori ON aset.id_kategori = kategori.id_kategori JOIN lokasi ON aset.id_lokasi = lokasi.id_lokasi ORDER BY id_aset DESC");
 
 
 // 1. Cari kode aset terakhir
@@ -43,6 +52,7 @@ $urutan++;
 // sprintf("%03s", $urutan) fungsinya biar angkanya jadi 001, 002, dst (3 digit)
 $huruf = "AST-";
 $kodeOtomatis = $huruf . sprintf("%03s", $urutan);
+
 
 ?>
 
@@ -80,6 +90,44 @@ $kodeOtomatis = $huruf . sprintf("%03s", $urutan);
 
         oFReader.onload = function(oFREvent) {
             imgPreview.src = oFREvent.target.result;
+        }
+    }
+
+    // function previewImage2() {
+    //     const image = document.querySelector('#foto-aset2');
+    //     const imgPreview = document.querySelector('#img-preview2');
+    //     const textPreview = document.querySelector('#text-preview2');
+
+    //     // Munculkan tag gambar, sembunyikan teks placeholder
+    //     imgPreview.style.display = 'block';
+    //     textPreview.style.display = 'none';
+
+    //     const oFReader = new FileReader();
+    //     oFReader.readAsDataURL(image.files[0]);
+
+    //     oFReader.onload = function(oFREvent) {
+    //         imgPreview.src = oFREvent.target.result;
+    //     }
+    // }
+
+    function previewUbah(id) {
+        // Ambil elemen berdasarkan ID unik tadi
+        const file = document.querySelector('#foto-aset2' + id);
+        const img = document.querySelector('#img-preview2' + id);
+        const text = document.querySelector('#text-preview2' + id);
+
+        if (file.files && file.files[0]) {
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                img.style.display = 'block'; // Tampilkan gambar
+                img.src = e.target.result; // Isi gambar dengan file baru
+                if (text) {
+                    text.style.display = 'none'; // Sembunyikan tulisan "Preview"
+                }
+            }
+
+            reader.readAsDataURL(file.files[0]);
         }
     }
 </script>
@@ -281,7 +329,7 @@ $kodeOtomatis = $huruf . sprintf("%03s", $urutan);
 
                                                     <div class="modal-footer text-center">
                                                         <button type="submit" class="btn text-light" name="simpan_pendataan" style="background-color: #14Ae5c;"><i class="bi bi-floppy me-2"></i> Simpan</button>
-                                                        <button type="submit" class="btn btn-danger" data-bs-dismiss="modal">Batal</button>
+                                                        <button type="reset" class="btn btn-danger" data-bs-dismiss="modal">Batal</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -294,10 +342,13 @@ $kodeOtomatis = $huruf . sprintf("%03s", $urutan);
 
                         <!-- Modal Ubah Pendataan Aset -->
                         <?php foreach ($data_aset as $aset) : ?>
-                            <div class="modal fade text-start fw-normal" id="modalUbahAset<?= $aset[0]['id_aset'] ?>
-                             " data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalUbahAsetLabel" aria-hidden="true">
+                            <div class="modal fade text-start fw-normal" id="modalUbahAset<?= $aset['id_aset'] ?>" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalUbahAsetLabel" aria-hidden="true">
                                 <div class="modal-dialog modal-xl">
                                     <form action="" method="post" enctype="multipart/form-data">
+                                        <!-- foto lama -->
+                                        <input type="hidden" name="old_foto" value="<?= $aset['foto_aset'] ?>">
+                                        <input type="hidden" name="id_aset" value="<?= $aset['id_aset'] ?>">
+
                                         <div class="modal-content border-0">
                                             <div class="modal-header px-5 text-light" style="background-color: #3a4ccb;">
                                                 <h1 class="modal-title fs-5 mx-4" id="modalTambahAsetLabel">Edit / Update Data Aset</h1>
@@ -312,29 +363,36 @@ $kodeOtomatis = $huruf . sprintf("%03s", $urutan);
                                                             <div class="col-md-5">
                                                                 <div class="mb-2 mt-2">
                                                                     <label for="nama-aset" class="">Kode Aset</label>
-                                                                    <input type="text" class="form-control fw-semibold form-control m-0 bg-secondary-subtle" readonly value="<?= $aset['kode_aset'] ?>
-                                                                    " name="kode_aset">
+                                                                    <input type="text" class="form-control fw-semibold form-control m-0 bg-secondary-subtle" readonly value="<?= $aset['kode_aset'] ?>" name="kode_aset">
                                                                 </div>
                                                                 <div class="mb-3 mt-3">
                                                                     <label for="nama-aset" class="form-label">Nama Aset</label>
-                                                                    <input type="text" class="form-control" name="nama_aset" id="nama-aset" placeholder="Masukkan Nama Aset" value="<?= $aset['nama_aset'] ?>
-                                                                    " required>
+                                                                    <input type="text" class="form-control fw-semibold" name="nama_aset" id="nama-aset" placeholder="Masukkan Nama Aset" value="<?= $aset['nama_aset'] ?>" required>
                                                                 </div>
                                                                 <div class="mb-3">
                                                                     <label for="lokasi" class="form-label">Lokasi</label>
-                                                                    <select class="form-select form-select mb-3" name="id_lokasi" required>
+                                                                    <select class="form-select form-select fw-semibold mb-3" name="id_lokasi" required>
                                                                         <option class="fw-light"> Pilih Lokasi </option>
                                                                         <?php foreach ($data_lokasi as $lokasi) : ?>
-                                                                            <option value=" <?= $lokasi['id_lokasi'] ?> "><?= $lokasi['nama_lokasi'] ?></option>
+                                                                            <option value="<?= $lokasi['id_lokasi'] ?>" <?= ($aset['id_lokasi'] == $lokasi['id_lokasi']) ? 'selected' : '' ?>>
+                                                                                <?= $lokasi['nama_lokasi'] ?>
+                                                                            </option>
                                                                         <?php endforeach ?>
                                                                     </select>
                                                                 </div>
                                                                 <div class="mb-3">
                                                                     <label for="kondisi" class="form-label">Kondisi</label>
-                                                                    <select class="form-select mb-3" required name="kondisi">
-                                                                        <option value="Baik">Baik</option>
-                                                                        <option value="Rusak Ringan">Rusak Ringan</option>
-                                                                        <option value="Rusak Berat">Rusak Berat</option>
+                                                                    <select class="form-select mb-3 fw-semibold" name="kondisi">
+                                                                        <option value="Baik" <?= ($aset['kondisi'] == 'Baik') ? 'selected' : '' ?>>
+                                                                            Baik
+                                                                        </option>
+                                                                        <option value="Rusak Ringan" <?= ($aset['kondisi'] == 'Rusak Ringan') ? 'selected' : '' ?>>
+                                                                            Rusak Ringan
+                                                                        </option>
+                                                                        <option value="Rusak Berat" <?= ($aset['kondisi'] == 'Rusak Berat') ? 'selected' : '' ?>>
+                                                                            Rusak Berat
+                                                                        </option>
+
                                                                     </select>
                                                                 </div>
                                                             </div>
@@ -342,28 +400,41 @@ $kodeOtomatis = $huruf . sprintf("%03s", $urutan);
                                                             <div class="col-md-5">
                                                                 <div class="mb-3">
                                                                     <label for="katgory" class="form-label">Kategori Aset</label>
-                                                                    <select class="form-select mb-3" name="id_kategori">
+                                                                    <select class="form-select mb-3 fw-semibold" name="id_kategori">
                                                                         <option class="fw-light"> Pilih Kategori </option>
                                                                         <?php foreach ($data_kategori as $kategori) : ?>
-                                                                            <option value="<?= $kategori['id_kategori'] ?>"><?= $kategori['nama_kategori']  ?></option>
+                                                                            <option value="<?= $kategori['id_kategori'] ?>" <?= ($aset['id_kategori'] == $kategori['id_kategori']) ? 'selected' : '' ?>>
+                                                                                <?= $kategori['nama_kategori'] ?>
+                                                                            </option>
                                                                         <?php endforeach ?>
                                                                     </select>
                                                                 </div>
                                                                 <div class="mb-3">
                                                                     <label for="tgl" class="form-label">Tanggal Perolehan</label>
-                                                                    <input type="date" class="form-control" id="tgl" name="tgl_perolehan" required>
+                                                                    <input type="date" class="form-control fw-semibold" id="tgl" name="tgl_perolehan" value="<?= $aset['tgl_perolehan'] ?>" required>
                                                                 </div>
                                                                 <div class="mb-3">
                                                                     <label for="status" class="form-label">Status</label>
-                                                                    <select class="form-select form-select mb-3" name="status" required>
-                                                                        <option value="Aktif">Aktif</option>
-                                                                        <option value="Cadangan">Cadangan</option>
-                                                                        <option value="Dihapuskan">Dihapuskan</option>
+                                                                    <select class="form-select form-select fw-semibold mb-3" name="status" required>
+
+                                                                        <option value="Aktif"
+                                                                            <?= ($aset['status'] === 'Aktif') ? 'selected' : '' ?>>
+                                                                            Aktif
+                                                                        </option>
+
+                                                                        <option value="Cadangan" <?= ($aset['status'] === 'Cadangan') ? 'selected' : '' ?>>
+                                                                            Cadangan
+                                                                        </option>
+
+                                                                        <option value="Dihapuskan" <?= ($aset['status'] === 'Dihapuskan') ? 'selected' : '' ?>>
+                                                                            Dihapuskan
+                                                                        </option>
+
                                                                     </select>
                                                                 </div>
                                                                 <div class="mb-3">
                                                                     <label for="spesifikasi" class="form-label">Spesifikasi</label>
-                                                                    <textarea class="form-control" name="spesifikasi" required id="spesifikasi" placeholder="Spesifikasi Aset"></textarea>
+                                                                    <textarea class="form-control fw-semibold" name="spesifikasi" required id="spesifikasi" placeholder="Spesifikasi Aset"><?= $aset['spesifikasi'] ?></textarea>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -371,7 +442,7 @@ $kodeOtomatis = $huruf . sprintf("%03s", $urutan);
                                                             <div class="col-md-10">
                                                                 <div class="mb-3">
                                                                     <label for="keterangan" class="form-label">Keterangan</label>
-                                                                    <textarea class="form-control" name="keterangan" required id="keterangan" placeholder="Keterangan Aset"></textarea>
+                                                                    <textarea class="form-control fw-semibold" name="keterangan" required id="keterangan" placeholder="Keterangan Aset"><?= $aset['keterangan'] ?></textarea>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -380,14 +451,16 @@ $kodeOtomatis = $huruf . sprintf("%03s", $urutan);
 
                                                     <div class="col-md-4 pe-5">
                                                         <div class="row justify-content-center mt-4">
-                                                            <div class="preview rounded my-3 bg-secondary-subtle d-flex align-items-center justify-content-center overflow-hidden" style="width: 80%; height: 300px; border: 2px dashed #ccc;">
-                                                                <img src="" id="img-preview" class="img-fluid" style="display: none; object-fit:cover; width: 100%; height: 100%;">
-                                                                <small id="text-preview" class="text-muted">Preview Foto</small>
+                                                            <div class="preview rounded-1 my-3  d-flex align-items-center justify-content-center" style="width: 100%; height: 250px; border: 2px dashed #ccc;">
+                                                                <img src="assets/img/foto-aset/<?= $aset['foto_aset'] ?>" id="img-preview2<?= $aset['id_aset'] ?>" class="img-fluid" style="display:<?= !empty($aset['foto_aset']) ? 'block' : 'none' ?>; width: 100%; height: 100%;">
+
+                                                                <small id="text-preview2<?= $aset['id_aset'] ?>" class="text-muted" style="display: <?= !empty($aset['foto_aset']) ? 'none' : 'block' ?>;">Preview Foto</small>
                                                             </div>
+
                                                             <div class="field ">
                                                                 <div class="row px-2">
                                                                     <div class="col-md px-4">
-                                                                        <input type="file" class="form-control form-control" aria-describedby="ket" name="foto_aset" id="foto-aset" onchange="previewImage()">
+                                                                        <input type="file" class="form-control form-control" aria-describedby="ket" name="foto_aset" id="foto-aset2<?= $aset['id_aset'] ?>" onchange="previewUbah(<?= $aset['id_aset'] ?>)">
                                                                         <div class="form-text" id="ket">* Ukuran Foto Max 2MB</div>
                                                                     </div>
                                                                 </div>
@@ -395,8 +468,8 @@ $kodeOtomatis = $huruf . sprintf("%03s", $urutan);
                                                         </div>
 
                                                         <div class="modal-footer text-center">
-                                                            <button type="submit" class="btn text-light" name="simpan_pendataan" style="background-color: #14Ae5c;"><i class="bi bi-floppy me-2"></i> Simpan</button>
-                                                            <button type="submit" class="btn btn-danger" data-bs-dismiss="modal">Batal</button>
+                                                            <button type="submit" class="btn text-light" name="update_pendataan" style="background-color: #14Ae5c;"><i class="bi bi-floppy me-2"></i> Update & Simpan</button>
+                                                            <button type="reset" class="btn btn-danger" data-bs-dismiss="modal">Batal</button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -421,18 +494,28 @@ $kodeOtomatis = $huruf . sprintf("%03s", $urutan);
                         </a>
                     </div>
                 <?php endif ?>
+                <?php if (isset($sukses_update)) : ?>
+                    <div class="alert alert-success p-2 border-0 alert-dismissible d-flex justify-content-between align-items-center px-3" role="alert">
+                        <div>
+                            <strong>Berhasil !</strong> Data Aset telah Diupdate.
+                        </div>
+                        <a href="" class="text-decoration-none text-success" data-bs-dismiss="alert" aria-label="Close">
+                            <i class="bi bi-x-lg"></i>
+                        </a>
+                    </div>
+                <?php endif ?>
                 <!-- table -->
                 <div class="table-responsive">
                     <table class="table table-borderless table-striped fw-light">
-                        <thead class="text-center border-bottom border-top">
+                        <thead class=" border-bottom border-top">
                             <tr>
                                 <th class="fs-6">NO</th>
                                 <th class="fs-6">KODE ASET</th>
                                 <th class="fs-6">NAMA ASET</th>
                                 <th class="fs-6">KATEGORI</th>
                                 <th class="fs-6">LOKASI</th>
-                                <th class="fs-6">KONDISI</th>
-                                <th class="fs-6"><i class="bi bi-pencil-square"></i></th>
+                                <th class="fs-6 text-center">KONDISI</th>
+                                <th class="fs-6 text-center"><i class="bi bi-pencil-square"></i></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -448,14 +531,14 @@ $kodeOtomatis = $huruf . sprintf("%03s", $urutan);
                                     </td>
                                     <td class=""><?= $aset['nama_kategori'] ?>
                                     </td>
-                                    <td class="text-center"><?= $aset['nama_lokasi'] ?>
+                                    <td class=""><?= $aset['nama_lokasi'] ?>
                                     </td>
                                     <td class="text-center"><?= $aset['kondisi'] ?>
                                     </td>
                                     <td class="text-end">
                                         <!-- Ubah Data -->
-                                        <a href="" style="color: #14Ae5c;" data-bs-toggle="modal" data-bs-target="#modalUbahAset<?= $aset['id_aset'] ?>
-                                         "><i class="bi bi-pencil-fill me-3"></i></a>
+                                        <a href="" style="color: #14Ae5c;" data-bs-toggle="modal" data-bs-target="#modalUbahAset<?= $aset['id_aset'] ?>">
+                                            <i class="bi bi-pencil-fill me-3"></i></a>
                                         <!-- Detail -->
                                         <a href="" style="color: #2b32b2;"><i class="bi bi-eye me-3"></i></a>
                                         <!-- Hapus -->
