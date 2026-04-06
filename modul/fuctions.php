@@ -91,22 +91,102 @@ function tambahDataPendataan($data)
     global $db_connect;
 
     // get data form
-    $kode_aset = $data['kode_aset'];
-    $nama_aset = $data['nama_aset'];
+    $kode_aset = htmlspecialchars($data['kode_aset']);
+    $nama_aset = htmlspecialchars($data['nama_aset']);
     $id_kategori = $data['id_kategori'];
-    $spesifikasi = $data['spesifikasi'];
+    $spesifikasi = htmlspecialchars($data['spesifikasi']);
     $id_lokasi = $data['id_lokasi'];
     $kondisi = $data['kondisi'];
     $status = $data['status'];
     $tgl_perolehan = $data['tgl_perolehan'];
-    $keterangan = $data['keterangan'];
-    $foto_aset = "default.jpg";
+    $keterangan = htmlspecialchars($data['keterangan']);
 
-    var_dump($kode_aset, $nama_aset, $id_kategori, $spesifikasi, $id_lokasi, $kondisi, $status, $tgl_perolehan, $keterangan, $foto_aset);
-    die;
+    $foto_aset = uploadFotoAset();
+    if (!$foto_aset) {
+        return false;
+    }
 
+    $query_data =  "INSERT INTO aset VALUES ('', '$kode_aset', '$nama_aset', '$id_kategori', '$spesifikasi', '$id_lokasi','$kondisi', '$status', '$tgl_perolehan', '$keterangan', '$foto_aset')";
+    mysqli_query($db_connect, $query_data);
 
     return mysqli_affected_rows($db_connect);
 }
+// Fungsi Upload Foto Aset
+function uploadFotoAset()
+{
 
+    // properti files
+    $name = $_FILES['foto_aset']['name'];
+    $ukuran = $_FILES['foto_aset']['size'];
+    $error = $_FILES['foto_aset']['error'];
+    $folder = $_FILES['foto_aset']['tmp_name'];
+
+    // Cek jika tidak ada gambar yang diupload
+    if ($error === 4) {
+        // echo "<script>
+        //         alert('Silahkan Upload Foto Aset !')
+        //       </script>";
+        return 'default.jpg';
+    }
+
+    // cek Ekstensi gambar
+
+    $ekstensiSistem = ['png', 'jpg', 'jpeg'];
+    $ekstensiGambar = explode('.', $name);
+    $ekstensiGambar = strtolower(end($ekstensiGambar));
+
+    // validasi ekstensi gambar yang diupload
+    if (!in_array($ekstensiGambar, $ekstensiSistem)) {
+        echo "<script>
+                alert('Ekstensi Gambar yang disarankan (JPG, JPEG, PNG)')
+              </script>";
+        return false;
+    }
+
+    // Cek ukuran gambar yang diupload
+    if ($ukuran > 5000000) { // 5MB
+        echo "<script>
+                alert('Ukuran Gambar terlalu besar - Max: (5MB)')
+              </script>";
+        return false;
+    }
+
+    // Berikan nama file yang unik
+    $namaBaru = uniqid() . '.' . $ekstensiGambar;
+
+    // Simpan gambar ke folder tujuan
+    if (move_uploaded_file($folder, './assets/img/foto-aset/' . $namaBaru)) {
+        return $namaBaru;
+    } else {
+        echo "<script>
+                alert('Gagal mengupload gambar')
+              </script>";
+        return false;
+    }
+}
+
+// Fungsi Hapus Data Aset
+function hapusAset($id_aset)
+{
+
+    global $db_connect;
+
+    // Ambi Nama FILE
+    $query_data = mysqli_query($db_connect, "SELECT foto_aset FROM aset WHERE id_aset = $id_aset");
+    $data = mysqli_fetch_array($query_data);
+    $nama_foto = $data['foto_aset'];
+
+    // 2. CEK & HAPUS FILE: Jangan hapus kalau itu 'default.jpg'!
+    if ($nama_foto != 'default.jpg') {
+        $path = "./assets/img/foto-aset/" . $nama_foto;
+
+        // Cek apakah file beneran ada di folder sebelum di-unlink
+        if (file_exists($path)) {
+            unlink($path); // Ini eksekusi "buang sampah"-nya, Bray!
+        }
+    }
+
+    mysqli_query($db_connect, "DELETE FROM aset WHERE id_aset = $id_aset");
+    return mysqli_affected_rows($db_connect);
+}
 // -----------------------------------

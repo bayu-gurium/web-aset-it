@@ -22,6 +22,27 @@ if (isset($_POST['simpan_pendataan'])) {
     }
 }
 
+// query JOIN Data Kategori dan Lokasi dengan data Aset
+$data_aset = allData("SELECT * FROM aset JOIN kategori ON aset.id_kategori = kategori.id_kategori JOIN lokasi ON aset.id_lokasi = lokasi.id_lokasi");
+
+
+
+// 1. Cari kode aset terakhir
+$query = mysqli_query($db_connect, "SELECT max(kode_aset) as kodeTerbesar FROM aset");
+$data = mysqli_fetch_array($query);
+$kodeAset = $data['kodeTerbesar'];
+
+// 2. Mengambil angka dari kode aset, misal AST-001 ambil 001-nya
+// Kita asumsikan formatnya AST-XXX (angka mulai dari karakter ke-4)
+$urutan = (int) substr($kodeAset, 4, 3);
+
+// 3. Bilangan ditambah 1
+$urutan++;
+
+// 4. Membentuk kode aset baru
+// sprintf("%03s", $urutan) fungsinya biar angkanya jadi 001, 002, dst (3 digit)
+$huruf = "AST-";
+$kodeOtomatis = $huruf . sprintf("%03s", $urutan);
 
 ?>
 
@@ -44,6 +65,24 @@ if (isset($_POST['simpan_pendataan'])) {
     <link rel="stylesheet" href="css/style.css">
 </head>
 
+<script>
+    function previewImage() {
+        const image = document.querySelector('#foto-aset');
+        const imgPreview = document.querySelector('#img-preview');
+        const textPreview = document.querySelector('#text-preview');
+
+        // Munculkan tag gambar, sembunyikan teks placeholder
+        imgPreview.style.display = 'block';
+        textPreview.style.display = 'none';
+
+        const oFReader = new FileReader();
+        oFReader.readAsDataURL(image.files[0]);
+
+        oFReader.onload = function(oFREvent) {
+            imgPreview.src = oFREvent.target.result;
+        }
+    }
+</script>
 
 
 <body>
@@ -116,7 +155,7 @@ if (isset($_POST['simpan_pendataan'])) {
     <!-- main content -->
     <div class="container px-5 main-content">
         <div class="row justify-content-center mt-4 mb-3">
-            <div class="col-lg-8">
+            <div class="col-lg-10">
                 <div class="row">
                     <div class="col-6 col-lg-6 font-pagination">
                         <small class="m-0">Page</small>
@@ -137,11 +176,11 @@ if (isset($_POST['simpan_pendataan'])) {
 
     <div class="container px-5">
         <div class="row justify-content-center">
-            <div class="col-lg-8">
+            <div class="col-lg-10">
                 <div class="row my-1">
                     <div class="col-lg text-end fw-lighter">
                         <button class="btn btn-sm text-light mb-2" style="background-color: #3a4ccb;" type="button" data-bs-toggle="modal" data-bs-target="#modalTambahAset"> <i class="bi bi-plus-circle"></i> Tambah Aset</button>
-                        <!-- Modal Tambah Pendtaan Aset -->
+                        <!-- Modal Tambah Pendataan Aset -->
                         <div class="modal fade text-start fw-normal" id="modalTambahAset" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalTambahAsetLabel" aria-hidden="true">
                             <div class="modal-dialog modal-xl">
                                 <form action="" method="post" enctype="multipart/form-data">
@@ -157,15 +196,18 @@ if (isset($_POST['simpan_pendataan'])) {
                                                     <div class="row justify-content-center">
                                                         <!-- col-1 -->
                                                         <div class="col-md-5">
-                                                            <div class="mb-3">
+                                                            <div class="mb-2 mt-2">
+                                                                <label for="nama-aset" class="">Kode Aset</label>
+                                                                <input type="text" class="form-control fw-semibold form-control m-0 bg-secondary-subtle" readonly value="<?= $kodeOtomatis ?>
+                                                                " name="kode_aset">
+                                                            </div>
+                                                            <div class="mb-3 mt-3">
                                                                 <label for="nama-aset" class="form-label">Nama Aset</label>
-
-                                                                <input type="text" value="AST-1" name="kode_aset">
-                                                                <input type="text" class="form-control" name="nama_aset" id="nama-aset" placeholder="Masukkan Nama Aset">
+                                                                <input type="text" class="form-control" name="nama_aset" id="nama-aset" placeholder="Masukkan Nama Aset" required>
                                                             </div>
                                                             <div class="mb-3">
                                                                 <label for="lokasi" class="form-label">Lokasi</label>
-                                                                <select class="form-select form-select mb-3" name="id_lokasi">
+                                                                <select class="form-select form-select mb-3" name="id_lokasi" required>
                                                                     <option class="fw-light"> Pilih Lokasi </option>
                                                                     <?php foreach ($data_lokasi as $lokasi) : ?>
                                                                         <option value=" <?= $lokasi['id_lokasi'] ?> "><?= $lokasi['nama_lokasi'] ?></option>
@@ -174,7 +216,7 @@ if (isset($_POST['simpan_pendataan'])) {
                                                             </div>
                                                             <div class="mb-3">
                                                                 <label for="kondisi" class="form-label">Kondisi</label>
-                                                                <select class="form-select form-select mb-3" name="kondisi">
+                                                                <select class="form-select mb-3" required name="kondisi">
                                                                     <option value="Baik">Baik</option>
                                                                     <option value="Rusak Ringan">Rusak Ringan</option>
                                                                     <option value="Rusak Berat">Rusak Berat</option>
@@ -185,7 +227,7 @@ if (isset($_POST['simpan_pendataan'])) {
                                                         <div class="col-md-5">
                                                             <div class="mb-3">
                                                                 <label for="katgory" class="form-label">Kategori Aset</label>
-                                                                <select class="form-select form-select mb-3" name="id_kategori">
+                                                                <select class="form-select mb-3" name="id_kategori">
                                                                     <option class="fw-light"> Pilih Kategori </option>
                                                                     <?php foreach ($data_kategori as $kategori) : ?>
                                                                         <option value="<?= $kategori['id_kategori'] ?>"><?= $kategori['nama_kategori']  ?></option>
@@ -194,23 +236,19 @@ if (isset($_POST['simpan_pendataan'])) {
                                                             </div>
                                                             <div class="mb-3">
                                                                 <label for="tgl" class="form-label">Tanggal Perolehan</label>
-                                                                <input type="date" class="form-control" id="tgl" name="tgl_perolehan">
+                                                                <input type="date" class="form-control" id="tgl" name="tgl_perolehan" required>
                                                             </div>
                                                             <div class="mb-3">
                                                                 <label for="status" class="form-label">Status</label>
-                                                                <select class="form-select form-select mb-3" name="status">
+                                                                <select class="form-select form-select mb-3" name="status" required>
                                                                     <option value="Aktif">Aktif</option>
                                                                     <option value="Cadangan">Cadangan</option>
                                                                     <option value="Dihapuskan">Dihapuskan</option>
                                                                 </select>
                                                             </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row justify-content-sm-center">
-                                                        <div class="col-md-10">
                                                             <div class="mb-3">
                                                                 <label for="spesifikasi" class="form-label">Spesifikasi</label>
-                                                                <textarea class="form-control" name="spesifikasi" id="spesifikasi" placeholder="Spesifikasi Aset"></textarea>
+                                                                <textarea class="form-control" name="spesifikasi" required id="spesifikasi" placeholder="Spesifikasi Aset"></textarea>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -218,24 +256,29 @@ if (isset($_POST['simpan_pendataan'])) {
                                                         <div class="col-md-10">
                                                             <div class="mb-3">
                                                                 <label for="keterangan" class="form-label">Keterangan</label>
-                                                                <textarea class="form-control" name="keterangan" id="keterangan" placeholder="Keterangan Aset"></textarea>
+                                                                <textarea class="form-control" name="keterangan" required id="keterangan" placeholder="Keterangan Aset"></textarea>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <!-- col 2 -->
+
                                                 <div class="col-md-4 pe-5">
                                                     <div class="row justify-content-center mt-4">
-                                                        <div class="preview  rounded my-3 bg-secondary-subtle" style="width: 80%; height: 300px;"></div>
+                                                        <div class="preview rounded my-3 bg-secondary-subtle d-flex align-items-center justify-content-center overflow-hidden" style="width: 80%; height: 300px; border: 2px dashed #ccc;">
+                                                            <img src="" id="img-preview" class="img-fluid" style="display: none; object-fit:cover; width: 100%; height: 100%;">
+                                                            <small id="text-preview" class="text-muted">Preview Foto</small>
+                                                        </div>
                                                         <div class="field ">
                                                             <div class="row px-2">
                                                                 <div class="col-md px-4">
-                                                                    <input type="file" class="form-control form-control" aria-describedby="ket" name="foto_aset">
-                                                                    <div class="form-text" id="ket">* Ukuran Foto Max 500MB</div>
+                                                                    <input type="file" class="form-control form-control" aria-describedby="ket" name="foto_aset" id="foto-aset" onchange="previewImage()">
+                                                                    <div class="form-text" id="ket">* Ukuran Foto Max 2MB</div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
+
                                                     <div class="modal-footer text-center">
                                                         <button type="submit" class="btn text-light" name="simpan_pendataan" style="background-color: #14Ae5c;"><i class="bi bi-floppy me-2"></i> Simpan</button>
                                                         <button type="submit" class="btn btn-danger" data-bs-dismiss="modal">Batal</button>
@@ -248,16 +291,134 @@ if (isset($_POST['simpan_pendataan'])) {
                             </div>
                         </div>
                         <!-- Modal end -->
+
+                        <!-- Modal Ubah Pendataan Aset -->
+                        <?php foreach ($data_aset as $aset) : ?>
+                            <div class="modal fade text-start fw-normal" id="modalUbahAset<?= $aset[0]['id_aset'] ?>
+                             " data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalUbahAsetLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-xl">
+                                    <form action="" method="post" enctype="multipart/form-data">
+                                        <div class="modal-content border-0">
+                                            <div class="modal-header px-5 text-light" style="background-color: #3a4ccb;">
+                                                <h1 class="modal-title fs-5 mx-4" id="modalTambahAsetLabel">Edit / Update Data Aset</h1>
+                                                <button type="button" class="btn ms-auto border-0 fs-5" data-bs-dismiss="modal" aria-label="close"><i class="bi bi-x-lg text-light"></i></button>
+                                            </div>
+                                            <div class="modal-body fw-light">
+                                                <div class="row justify-content-center">
+                                                    <!-- col 1 -->
+                                                    <div class="col-md-8">
+                                                        <div class="row justify-content-center">
+                                                            <!-- col-1 -->
+                                                            <div class="col-md-5">
+                                                                <div class="mb-2 mt-2">
+                                                                    <label for="nama-aset" class="">Kode Aset</label>
+                                                                    <input type="text" class="form-control fw-semibold form-control m-0 bg-secondary-subtle" readonly value="<?= $aset['kode_aset'] ?>
+                                                                    " name="kode_aset">
+                                                                </div>
+                                                                <div class="mb-3 mt-3">
+                                                                    <label for="nama-aset" class="form-label">Nama Aset</label>
+                                                                    <input type="text" class="form-control" name="nama_aset" id="nama-aset" placeholder="Masukkan Nama Aset" value="<?= $aset['nama_aset'] ?>
+                                                                    " required>
+                                                                </div>
+                                                                <div class="mb-3">
+                                                                    <label for="lokasi" class="form-label">Lokasi</label>
+                                                                    <select class="form-select form-select mb-3" name="id_lokasi" required>
+                                                                        <option class="fw-light"> Pilih Lokasi </option>
+                                                                        <?php foreach ($data_lokasi as $lokasi) : ?>
+                                                                            <option value=" <?= $lokasi['id_lokasi'] ?> "><?= $lokasi['nama_lokasi'] ?></option>
+                                                                        <?php endforeach ?>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="mb-3">
+                                                                    <label for="kondisi" class="form-label">Kondisi</label>
+                                                                    <select class="form-select mb-3" required name="kondisi">
+                                                                        <option value="Baik">Baik</option>
+                                                                        <option value="Rusak Ringan">Rusak Ringan</option>
+                                                                        <option value="Rusak Berat">Rusak Berat</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <!-- col-2 -->
+                                                            <div class="col-md-5">
+                                                                <div class="mb-3">
+                                                                    <label for="katgory" class="form-label">Kategori Aset</label>
+                                                                    <select class="form-select mb-3" name="id_kategori">
+                                                                        <option class="fw-light"> Pilih Kategori </option>
+                                                                        <?php foreach ($data_kategori as $kategori) : ?>
+                                                                            <option value="<?= $kategori['id_kategori'] ?>"><?= $kategori['nama_kategori']  ?></option>
+                                                                        <?php endforeach ?>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="mb-3">
+                                                                    <label for="tgl" class="form-label">Tanggal Perolehan</label>
+                                                                    <input type="date" class="form-control" id="tgl" name="tgl_perolehan" required>
+                                                                </div>
+                                                                <div class="mb-3">
+                                                                    <label for="status" class="form-label">Status</label>
+                                                                    <select class="form-select form-select mb-3" name="status" required>
+                                                                        <option value="Aktif">Aktif</option>
+                                                                        <option value="Cadangan">Cadangan</option>
+                                                                        <option value="Dihapuskan">Dihapuskan</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="mb-3">
+                                                                    <label for="spesifikasi" class="form-label">Spesifikasi</label>
+                                                                    <textarea class="form-control" name="spesifikasi" required id="spesifikasi" placeholder="Spesifikasi Aset"></textarea>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row justify-content-sm-center">
+                                                            <div class="col-md-10">
+                                                                <div class="mb-3">
+                                                                    <label for="keterangan" class="form-label">Keterangan</label>
+                                                                    <textarea class="form-control" name="keterangan" required id="keterangan" placeholder="Keterangan Aset"></textarea>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <!-- col 2 -->
+
+                                                    <div class="col-md-4 pe-5">
+                                                        <div class="row justify-content-center mt-4">
+                                                            <div class="preview rounded my-3 bg-secondary-subtle d-flex align-items-center justify-content-center overflow-hidden" style="width: 80%; height: 300px; border: 2px dashed #ccc;">
+                                                                <img src="" id="img-preview" class="img-fluid" style="display: none; object-fit:cover; width: 100%; height: 100%;">
+                                                                <small id="text-preview" class="text-muted">Preview Foto</small>
+                                                            </div>
+                                                            <div class="field ">
+                                                                <div class="row px-2">
+                                                                    <div class="col-md px-4">
+                                                                        <input type="file" class="form-control form-control" aria-describedby="ket" name="foto_aset" id="foto-aset" onchange="previewImage()">
+                                                                        <div class="form-text" id="ket">* Ukuran Foto Max 2MB</div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="modal-footer text-center">
+                                                            <button type="submit" class="btn text-light" name="simpan_pendataan" style="background-color: #14Ae5c;"><i class="bi bi-floppy me-2"></i> Simpan</button>
+                                                            <button type="submit" class="btn btn-danger" data-bs-dismiss="modal">Batal</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+
+                        <!-- Modal end -->
                     </div>
                 </div>
+
                 <?php if (isset($sukses)) : ?>
-                    <div class="alert alert-success p-2 px-2 border-0">
-                        <small>Data Aset Baru berhasil Ditambahkan</small>
-                    </div>
-                <?php endif ?>
-                <?php if (isset($error)) : ?>
-                    <div class="alert alert-danger p-2 px-2 border-0">
-                        <small>Data Aset Gagal Ditambahkan!!</small>
+                    <div class="alert alert-success p-2 border-0 alert-dismissible d-flex justify-content-between align-items-center px-3" role="alert">
+                        <div>
+                            <strong>Berhasil !</strong> Data Aset Baru Berhasil Ditambahkan.
+                        </div>
+                        <a href="" class="text-decoration-none text-success" data-bs-dismiss="alert" aria-label="Close">
+                            <i class="bi bi-x-lg"></i>
+                        </a>
                     </div>
                 <?php endif ?>
                 <!-- table -->
@@ -275,33 +436,34 @@ if (isset($_POST['simpan_pendataan'])) {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td class="">1</td>
-                                <td class="">BRI01</td>
-                                <td class="">Printer Epson</td>
-                                <td class="">Printer</td>
-                                <td class="text-center">BRIBOX</td>
-                                <td class="text-center">Baik</td>
-                                <td class="text-end">
-                                    <a href="" style="color: #14Ae5c;"><i class="bi bi-pencil-fill me-3"></i></a>
-                                    <a href="" style="color: #f24822;"><i class="bi bi-trash3 me-3"></i></a>
-                                    <a href="" style="color: #2b32b2;"><i class="bi bi-eye me-3"></i></a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="">1</td>
-                                <td class="">BRI01</td>
-                                <td class="">Printer Epson</td>
-                                <td class="">Printer</td>
-                                <td class="text-center">BRIBOX</td>
-                                <td class="text-center">Baik</td>
-                                <td class="text-end">
-                                    <a href="" style="color: #14Ae5c;"><i class="bi bi-pencil-fill me-3"></i></a>
-                                    <a href="" style="color: #f24822;"><i class="bi bi-trash3 me-3"></i></a>
-                                    <a href="" style="color: #2b32b2;"><i class="bi bi-eye me-3"></i></a>
+                            <?php
+                            $no_tabel = 1;
+                            foreach ($data_aset as $aset) : ?>
+                                <tr>
+                                    <td class=""><?= $no_tabel++ ?>
+                                    </td>
+                                    <td class=""><?= $aset['kode_aset'] ?>
+                                    </td>
+                                    <td class=""><?= $aset['nama_aset'] ?>
+                                    </td>
+                                    <td class=""><?= $aset['nama_kategori'] ?>
+                                    </td>
+                                    <td class="text-center"><?= $aset['nama_lokasi'] ?>
+                                    </td>
+                                    <td class="text-center"><?= $aset['kondisi'] ?>
+                                    </td>
+                                    <td class="text-end">
+                                        <!-- Ubah Data -->
+                                        <a href="" style="color: #14Ae5c;" data-bs-toggle="modal" data-bs-target="#modalUbahAset<?= $aset['id_aset'] ?>
+                                         "><i class="bi bi-pencil-fill me-3"></i></a>
+                                        <!-- Detail -->
+                                        <a href="" style="color: #2b32b2;"><i class="bi bi-eye me-3"></i></a>
+                                        <!-- Hapus -->
+                                        <a href="hapus-aset.php?id=<?= $aset['id_aset'] ?>" style="color: #f24822;" onclick="return confirm('Yakin mau hapus aset ini ?')"><i class="bi bi-trash3 me-3"></i></a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
 
-                                </td>
-                            </tr>
                         </tbody>
                     </table>
                 </div>

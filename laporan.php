@@ -100,7 +100,7 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] !== true) {
     <!-- main content -->
     <div class="container px-5 main-content">
         <div class="row justify-content-center mt-4 mb-3">
-            <div class="col-lg-8">
+            <div class="col-lg-10">
                 <div class="row">
                     <div class="col-6 col-lg-6 font-pagination">
                         <small class="m-0">Page</small>
@@ -121,7 +121,7 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] !== true) {
 
     <div class="container px-5">
         <div class="row justify-content-center">
-            <div class="col-lg-8">
+            <div class="col-lg-10">
                 <div class="row my-1">
                     <div class="col-lg text-end fw-lighter">
                         <button class="btn btn-sm text-light" style="background-color: #3a4ccb;" type="button" data-bs-toggle="modal" data-bs-target="#modalTambahAset"> <i class="bi bi-plus-circle"></i> Tambah Aset</button>
