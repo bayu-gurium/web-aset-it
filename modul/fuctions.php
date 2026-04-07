@@ -186,6 +186,11 @@ function updateDaatAset($data)
     if ($_FILES['foto_aset']['error'] == 4) {
         $foto_aset = $old_foto;
     } else {
+        // cek nama foto yang ada di dalam folder 
+        if (file_exists("./assets/img/foto-aset/" . $old_foto)) {
+            // hapus foto yang lama
+            unlink("./assets/img/foto-aset/" . $old_foto);
+        }
 
         $foto_aset = uploadFotoAset();
     }

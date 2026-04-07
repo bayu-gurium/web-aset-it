@@ -228,6 +228,7 @@ $kodeOtomatis = $huruf . sprintf("%03s", $urutan);
                 <div class="row my-1">
                     <div class="col-lg text-end fw-lighter">
                         <button class="btn btn-sm text-light mb-2" style="background-color: #3a4ccb;" type="button" data-bs-toggle="modal" data-bs-target="#modalTambahAset"> <i class="bi bi-plus-circle"></i> Tambah Aset</button>
+
                         <!-- Modal Tambah Pendataan Aset -->
                         <div class="modal fade text-start fw-normal" id="modalTambahAset" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalTambahAsetLabel" aria-hidden="true">
                             <div class="modal-dialog modal-xl">
@@ -338,7 +339,7 @@ $kodeOtomatis = $huruf . sprintf("%03s", $urutan);
                                 </form>
                             </div>
                         </div>
-                        <!-- Modal end -->
+                        <!-- Modal Tambah Data Aset end -->
 
                         <!-- Modal Ubah Pendataan Aset -->
                         <?php foreach ($data_aset as $aset) : ?>
@@ -479,11 +480,93 @@ $kodeOtomatis = $huruf . sprintf("%03s", $urutan);
                                 </div>
                             </div>
                         <?php endforeach; ?>
+                        <!-- Modal Ubah Data  Aset end -->
 
-                        <!-- Modal end -->
+                        <!-- Modal Detail Pendataan Aset -->
+                        <?php foreach ($data_aset as $aset) : ?>
+                            <div class="modal fade text-start fw-normal" id="modalDetailAset<?= $aset['id_aset'] ?>" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalDetailAsetLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-xl">
+                                    <form action="" method="post" enctype="multipart/form-data">
+                                        <div class="modal-content border-0">
+                                            <div class="modal-header px-5 p-2 text-light" style="background-color: #3a4ccb;">
+                                                <h1 class="modal-title fs-5 mx-2" id="modalTambahAsetLabel">Detail Data Aset <?= $aset['kode_aset'] ?> - <?= $aset['nama_aset'] ?> </h1>
+                                                <button type="button" class="btn ms-auto border-0 fs-5 text-light" data-bs-dismiss="modal" aria-label="close"><i class="bi bi-x-lg"></i></button>
+                                            </div>
+                                            <div class="modal-body fw-light">
+                                                <div class="row">
+                                                    <div class="col-md-5 mb-3">
+                                                        <div class="card border-0 shadow-sm">
+                                                            <img src="assets/img/foto-aset/<?= $aset['foto_aset'] ?>" class="img-fluid rounded" style="width: 100%; height: 450px; object-fit: cover;">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-7 pe-5">
+                                                        <h4 class="fw-bold"><?= $aset['nama_aset'] ?></h4>
+                                                        <hr>
+                                                        <ul class="list-group list-group-flush">
+                                                            <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0">
+                                                                <span>
+                                                                    <i class="bi bi-tag-fill text-muted me-2"></i>
+                                                                    <span class="text-muted">Kategori</span>
+                                                                </span>
+                                                                <span class="fw-semibold"><?= $aset['nama_kategori'] ?></span>
+                                                            </li>
+                                                            <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0">
+                                                                <span>
+                                                                    <i class="bi bi-calendar3 text-muted me-2"></i>
+                                                                    <span class="text-muted">Tanggal Perolehan</span>
+                                                                </span>
+                                                                <span class="fw-semibold"><?= date('d M Y', strtotime($aset['tgl_perolehan'])) ?></span>
+                                                            </li>
+                                                            <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0">
+                                                                <span>
+                                                                    <i class="bi bi-geo-alt-fill text-muted me-2"></i>
+                                                                    <span class="text-muted">Lokasi Penempatan</span>
+                                                                </span>
+                                                                <span class="fw-semibold"><?= $aset['nama_lokasi'] ?></span>
+                                                            </li>
+                                                            <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0">
+                                                                <span>
+                                                                    <i class="bi bi-activity text-muted me-2"></i>
+                                                                    <span class="text-muted">Kondisi Saat Ini</span>
+                                                                </span>
+                                                                <span class="badge rounded bg-<?= ($aset['kondisi'] == 'Baik') ? 'success' : 'warning' ?>">
+                                                                    <?= $aset['kondisi'] ?>
+                                                                </span>
+                                                            </li>
+                                                            <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0">
+                                                                <span>
+                                                                    <i class="bi bi-info-circle-fill text-muted me-2"></i>
+                                                                    <span class="text-muted">Status Operasional</span>
+                                                                </span>
+                                                                <span class="fw-semibold text-<?= ($aset['status'] == 'Aktif') ? 'success' : 'warning' ?> "><?= $aset['status'] ?></span>
+                                                            </li>
+                                                            <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0">
+                                                            </li>
+                                                        </ul>
+                                                        <div class="row mt-4">
+                                                            <div class="col-12">
+                                                                <div class="p-3 bg-light rounded-1 border-start border-info border-2">
+                                                                    <h6 class="fw-bold">Spesifikasi Teknik:</h6>
+                                                                    <p class="mb-0 text-secondary small"><?= nl2br($aset['spesifikasi']) ?></p>
+                                                                </div>
+                                                                <div class="mt-3 p-2 bg-light rounded-1 border-start border-secondary border-2">
+                                                                    <h6 class="fw-bold">Keterangan Tambahan:</h6>
+                                                                    <p class="text-muted small"><?= !empty($aset['keterangan']) ? nl2br($aset['keterangan']) : '-' ?></p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!--  -->
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                        <!-- Modal Detail Data  Aset end -->
                     </div>
                 </div>
-
                 <?php if (isset($sukses)) : ?>
                     <div class="alert alert-success p-2 border-0 alert-dismissible d-flex justify-content-between align-items-center px-3" role="alert">
                         <div>
@@ -537,12 +620,19 @@ $kodeOtomatis = $huruf . sprintf("%03s", $urutan);
                                     </td>
                                     <td class="text-end">
                                         <!-- Ubah Data -->
-                                        <a href="" style="color: #14Ae5c;" data-bs-toggle="modal" data-bs-target="#modalUbahAset<?= $aset['id_aset'] ?>">
-                                            <i class="bi bi-pencil-fill me-3"></i></a>
+                                        <a href="" style="color: #14Ae5c;" data-bs-toggle="modal" class="text-decoration-none" data-bs-target="#modalUbahAset<?= $aset['id_aset'] ?>">
+                                            <i class="bi bi-pencil-fill me-3"></i>
+                                        </a>
+
                                         <!-- Detail -->
-                                        <a href="" style="color: #2b32b2;"><i class="bi bi-eye me-3"></i></a>
+                                        <a href="" style="color: #2b32b2;" data-bs-toggle="modal" data-bs-target="#modalDetailAset<?= $aset['id_aset'] ?>" class="text-decoration-none">
+                                            <i class="bi bi-eye me-3"></i>
+                                        </a>
+
                                         <!-- Hapus -->
-                                        <a href="hapus-aset.php?id=<?= $aset['id_aset'] ?>" style="color: #f24822;" onclick="return confirm('Yakin mau hapus aset ini ?')"><i class="bi bi-trash3 me-3"></i></a>
+                                        <a href="hapus-aset.php?id=<?= $aset['id_aset'] ?>" class="text-decoration-none" style="color: #f24822;" onclick="return confirm('Yakin mau hapus aset ini ?')">
+                                            <i class="bi bi-trash3 me-3"></i>
+                                        </a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -551,7 +641,6 @@ $kodeOtomatis = $huruf . sprintf("%03s", $urutan);
                     </table>
                 </div>
                 <!-- table end -->
-
             </div>
         </div>
     </div>
