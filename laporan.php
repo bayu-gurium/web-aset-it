@@ -8,6 +8,10 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] !== true) {
     exit;
 }
 
+// query JOIN Data Kategori dan Lokasi dengan data Aset
+$data_aset = allData("SELECT * FROM aset JOIN kategori ON aset.id_kategori = kategori.id_kategori JOIN lokasi ON aset.id_lokasi = lokasi.id_lokasi ORDER BY id_aset ASC");
+
+
 ?>
 
 
@@ -27,7 +31,22 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] !== true) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <!-- link css -->
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        .table-responsive::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 10px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb:hover {
+            background: #666;
+        }
+    </style>
 </head>
+
 
 <body>
     <div class="container px-5 fixed-top">
@@ -85,9 +104,8 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] !== true) {
                                 </li>
                             </ul>
                         </div>
+
                         <!-- account dropdown end -->
-
-
                         <a class="mx-0 mx-lg-5 log-styles" href="logout.php">
                             <i class="bi bi-box-arrow-right log-styles"></i> LOGOUT</a>
                     </div>
@@ -104,7 +122,7 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] !== true) {
                 <div class="row">
                     <div class="col-6 col-lg-6 font-pagination">
                         <small class="m-0">Page</small>
-                        <h5>Pengelolaan Aset</h5>
+                        <h5>Laporan</h5>
                     </div>
                     <div class="col-lg col-lg-6">
                         <form action="" method="post">
@@ -122,149 +140,73 @@ if (!isset($_SESSION['login']) || $_SESSION['login'] !== true) {
     <div class="container px-5">
         <div class="row justify-content-center">
             <div class="col-lg-10">
-                <div class="row my-1">
-                    <div class="col-lg text-end fw-lighter">
-                        <button class="btn btn-sm text-light" style="background-color: #3a4ccb;" type="button" data-bs-toggle="modal" data-bs-target="#modalTambahAset"> <i class="bi bi-plus-circle"></i> Tambah Aset</button>
-                        <!-- Modal -->
-                        <div class="modal fade text-start fw-normal" id="modalTambahAset" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalTambahAsetLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-xl">
-                                <form action="">
-                                    <div class="modal-content border-0">
-                                        <div class="modal-header px-5 text-light" style="background-color: #3a4ccb;">
-                                            <h1 class="modal-title fs-5 mx-4" id="modalTambahAsetLabel">Tambah Data Aset Baru</h1>
-                                            <button type="button" class="btn-close me-4" data-bs-dismiss="modal" aria-label="close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <div class="row justify-content-center">
-                                                <!-- col 1 -->
-                                                <div class="col-md-8">
-                                                    <div class="row justify-content-center">
-                                                        <!-- col-1 -->
-                                                        <div class="col-md-5">
-                                                            <div class="mb-3">
-                                                                <label for="nama-aset" class="form-label">Nama Aset</label>
-                                                                <input type="text" class="form-control " name="nama-aset" id="nama-aset" placeholder="Nama Aset">
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label for="lokasi" class="form-label">Lokasi</label>
-                                                                <select class="form-select form-select mb-3" name="lokasi">
-                                                                    <option selected> Pilih Lokasi </option>
-                                                                    <option value="1">Teller</option>
-                                                                    <option value="2">Operator</option>
-                                                                    <option value="3">Gudang</option>
-                                                                </select>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label for="kondisi" class="form-label">Kondisi</label>
-                                                                <select class="form-select form-select mb-3" name="kondisi">
-                                                                    <option value="1">Baik</option>
-                                                                    <option value="2">Rusak Ringan</option>
-                                                                    <option value="3">Rusak Berat</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                        <!-- col-2 -->
-                                                        <div class="col-md-5">
-                                                            <div class="mb-3">
-                                                                <label for="katgory" class="form-label">Kategori Aset</label>
-                                                                <select class="form-select form-select mb-3" name="kategory">
-                                                                    <option selected> Pilih Kategori </option>
-                                                                    <option value="1">Leptop</option>
-                                                                    <option value="2">Printer</option>
-                                                                    <option value="3">Wifi</option>
-                                                                </select>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label for="tgl" class="form-label">Tanggal Perolehan</label>
-                                                                <input type="date" class="form-control" id="tgl" name="tgl">
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label for="status" class="form-label">Status</label>
-                                                                <select class="form-select form-select mb-3" name="status">
-                                                                    <option value="1">Aktif</option>
-                                                                    <option value="2">Cadangan</option>
-                                                                    <option value="3">Dihapuskan</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row justify-content-sm-center">
-                                                        <div class="col-md-10">
-                                                            <div class="mb-3">
-                                                                <label for="spesifikasi" class="form-label">Spesifikasi</label>
-                                                                <textarea class="form-control" name="spesifikasi" id="spesifikasi" placeholder="Spesifikasi Aset"></textarea>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row justify-content-sm-center">
-                                                        <div class="col-md-10">
-                                                            <div class="mb-3">
-                                                                <label for="keterangan" class="form-label">Keterangan</label>
-                                                                <textarea class="form-control" name="keterangan" id="keterangan" placeholder="Keterangan Aset"></textarea>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <!-- col 2 -->
-                                                <div class="col-md-4 pe-5">
-                                                    <div class="row justify-content-center mt-4">
-                                                        <div class="preview  rounded my-3 bg-secondary-subtle" style="width: 80%; height: 300px;"></div>
-                                                        <div class="field ">
-                                                            <div class="row px-2">
-                                                                <div class="col-md px-4">
-                                                                    <input type="file" class="form-control form-control" aria-describedby="ket">
-                                                                    <div class="form-text" id="ket">* Ukuran Foto Max 500MB</div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-footer text-center">
-                                                        <button type="submit" class="btn text-light" style="background-color: #14Ae5c;"><i class="bi bi-floppy me-2"></i> Simpan</button>
-                                                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Batal</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
+                <div class="mb-3">
+                    <div class="card shadow-sm">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <h5 class="fw-bold mb-0">Laporan Inventaris Aset</h5>
+                            <div class="btn-group">
+                                <a href="export_pdf.php" target="_blank" class="btn btn-danger btn-sm">
+                                    <i class="bi bi-file-earmark-pdf"></i> Export PDF
+                                </a>
+                                <a href="export_excel.php" target="_blank" class="btn btn-success btn-sm">
+                                    <i class="bi bi-file-earmark-excel"></i> Export Excel
+                                </a>
                             </div>
                         </div>
-                        <!-- Modal end -->
                     </div>
                 </div>
-                <!-- table -->
-                <div class="table-responsive">
-                    <table class="table table-sm table-borderless table-striped">
-                        <thead class="text-center border-bottom border-top">
-                            <tr>
-                                <th class="th-1">NO</th>
-                                <th class="th-1">KODE ASET</th>
-                                <th class="th-1">NAMA ASET</th>
-                                <th class="th-1">KATEGORI</th>
-                                <th class="th-1">LOKASI</th>
-                                <th class="th-1">KONDISI</th>
-                                <th class="th-1"><i class="bi bi-pencil-square"></i></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="td-">1</td>
-                                <td class="td-">BRI01</td>
-                                <td class="td-">Printer Epson</td>
-                                <td class="td-">Printer</td>
-                                <td class="text-center td-">BRIBOX</td>
-                                <td class="text-center td-">Baik</td>
-                                <td class="text-end td-">
-                                    <a href="" style="color: #14Ae5c;"><i class="bi bi-pencil-fill me-3"></i></a>
-                                    <a href="" style="color: #f24822;"><i class="bi bi-trash3 me-3"></i></a>
-                                    <a href="" style="color: #2b32b2;"><i class="bi bi-eye me-3"></i></a>
 
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="card shadow-sm border-0">
+                    <div class="card-body ">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-borderless align-middle">
+                                <thead class="table-dark">
+                                    <tr class="text-nowrap">
+                                        <th>No</th>
+                                        <th>Kode Aset</th>
+                                        <th>Nama Aset</th>
+                                        <th>Kategori</th>
+                                        <th>Status</th>
+                                        <th>Lokasi</th>
+                                        <th class="text-nowrap text-center">Kondisi</th>
+                                        <th>Tgl Perolehan</th>
+                                        <th>Spesifikasi</th>
+                                        <th>Keterangan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php if (!empty($data_aset)) : ?>
+                                        <?php
+                                        $no_data = 1;
+                                        foreach ($data_aset as $aset) : ?>
+                                            <tr class="fw-light align-middle">
+                                                <td><?= $no_data++ ?></td>
+                                                <td><span class="badge bg-light text-dark"><?= $aset['kode_aset'] ?></span></td>
+                                                <td class="text-nowrap fw-semibold"><?= $aset['nama_aset'] ?></td>
+                                                <td class="text-nowrap"><?= $aset['nama_kategori'] ?></td>
+                                                <td><span class="text-<?= ($aset['status'] == 'Aktif') ? 'success' : 'warning' ?> "><?= $aset['status'] ?></span></td>
+                                                <td class="text-nowrap"><?= $aset['nama_lokasi'] ?></td>
+                                                <td class="text-nowrap text-center"><?= $aset['kondisi'] ?></td>
+                                                <td class="text-nowrap"><?= date('d M Y', strtotime($aset['tgl_perolehan'])) ?></td>
+                                                <td style="min-width: 250px;"><?= $aset['spesifikasi'] ?></td>
+                                                <td style="min-width: 200px;"><?= $aset['keterangan'] ?></td>
+                                            </tr>
+                                        <?php endforeach ?>
+                                    <?php else : ?>
+                                        <tr>
+                                            <td colspan="10" class="text-center py-5 text-muted">
+                                                <i class="bi bi-box-seam d-block mb-2 fs-2"></i>
+                                                <p class="mb-0">Belum ada data aset yang terdaftar.</p>
+                                                <small>Silakan tambahkan data melalui menu Pengelolaan Aset.</small>
+                                            </td>
+                                        </tr>
+                                    <?php endif ?>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-                <!-- table end -->
 
             </div>
         </div>
