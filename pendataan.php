@@ -177,13 +177,13 @@ $kodeOtomatis = $huruf . sprintf("%03s", $urutan);
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-3" aria-labelledby="userMenu">
                                 <li>
-                                    <h6 class="dropdown-header">Admin Profile</h6>
+                                    <h6 class="dropdown-header">User Profile</h6>
                                 </li>
-                                <li><a class="dropdown-item" href="kategori_lokasi.php"><i class="bi bi-person me-2"></i> Kategori & Lokasi</a></li>
+                                <li><a class="dropdown-item" href="profile.php"><i class="bi bi-person me-2"></i> Profile Saya</a></li>
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
-                                <li><a class="dropdown-item" href="#"><i class="bi bi-shield-lock me-2"></i> Ganti Password</a></li>
+                                <li><a class="dropdown-item" href="user.php"><i class="bi bi-person-add me-2"></i> Admin Terdaftar</a></li>
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
@@ -209,14 +209,16 @@ $kodeOtomatis = $huruf . sprintf("%03s", $urutan);
                         <small class="m-0">Page</small>
                         <h5>Pengelolaan Aset</h5>
                     </div>
+                    <!-- Search Form -->
                     <div class="col-lg col-lg-6">
-                        <form action="" method="post">
+                        <form action="search-result.php" method="get">
                             <div class="input-group mt-2">
-                                <input type="text" class="form-control fw-lighter rounded-start-3" placeholder="Search">
+                                <input type="text" name="keyword" class="form-control rounded-start-3" placeholder="Search" autocomplete="off">
                                 <button class="btn btn-search-styles  rounded-end-3" type="submit" id="submit"><i class="bi bi-search" style="font-size: 20px;"></i></button>
                             </div>
                         </form>
                     </div>
+                    <!-- Search Form End -->
                 </div>
             </div>
         </div>
@@ -256,7 +258,7 @@ $kodeOtomatis = $huruf . sprintf("%03s", $urutan);
                                                             </div>
                                                             <div class="mb-3">
                                                                 <label for="lokasi" class="form-label">Lokasi</label>
-                                                                <select class="form-select form-select mb-3" name="id_lokasi" required>
+                                                                <select required class="form-select form-select mb-3" name="id_lokasi">
                                                                     <option class="fw-light"> Pilih Lokasi </option>
                                                                     <?php foreach ($data_lokasi as $lokasi) : ?>
                                                                         <option value=" <?= $lokasi['id_lokasi'] ?> "><?= $lokasi['nama_lokasi'] ?></option>

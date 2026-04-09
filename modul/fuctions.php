@@ -236,3 +236,76 @@ function hapusAset($id_aset)
     return mysqli_affected_rows($db_connect);
 }
 // -----------------------------------
+
+// Count Data Aset
+// Semua Data - Versi Ringan
+function jumlahAset()
+{
+    global $db_connect;
+    $result = mysqli_query($db_connect, "SELECT COUNT(*) AS total FROM aset");
+    $data = mysqli_fetch_assoc($result);
+    return $data['total'];
+}
+
+// Status Aktif
+function jumlahAsetAktif()
+{
+    global $db_connect;
+    $result = mysqli_query($db_connect, "SELECT COUNT(*) AS total FROM aset WHERE status = 'Aktif'");
+    $data = mysqli_fetch_assoc($result);
+    return $data['total'];
+}
+
+// Kondisi Baik
+function kondisiBaik()
+{
+    global $db_connect;
+    $result = mysqli_query($db_connect, "SELECT COUNT(*) AS total FROM aset WHERE kondisi = 'Baik'");
+    $data = mysqli_fetch_assoc($result);
+    return $data['total'];
+}
+
+// Kelola Data User
+function tambahUser($data)
+{
+
+    global $db_connect;
+
+    $username = mysqli_escape_string($db_connect, $data['username']);
+    $password = mysqli_escape_string($db_connect, $data['password']);
+    $password2 = mysqli_escape_string($db_connect, $data['password2']);
+    $nama_lengkap = mysqli_escape_string($db_connect, $data['nama_lengkap']);
+    $role = mysqli_escape_string($db_connect, $data['role']);
+    $foto_profile = "profile.png";
+
+    // cek username
+    $cek = mysqli_query($db_connect, "SELECT username FROM user WHERE username = '$username' ");
+    $data_user = mysqli_fetch_assoc($cek);
+    if ($data_user) {
+        echo "<script>alert('Username sudah terdaftar!');</script>";
+        return false;
+    }
+    // cek konfirmasi password
+    if ($password !== $password2) {
+        echo "<script>alert('Konfirmasi Password tidak sesuai!');</script>";
+        return false;
+    }
+
+    // hashsing password
+    $password_fix = password_hash($password, PASSWORD_DEFAULT);
+
+
+    mysqli_query($db_connect, "INSERT INTO user VALUES ('', '$username', '$password_fix', '$nama_lengkap', '$role', '$foto_profile') ");
+
+    return mysqli_affected_rows($db_connect);
+}
+
+// Hapus user
+function hapusUser($id_user)
+{
+
+    global $db_connect;
+
+    mysqli_query($db_connect, "DELETE FROM user WHERE id_user = $id_user");
+    return mysqli_affected_rows($db_connect);
+}

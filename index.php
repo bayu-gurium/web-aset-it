@@ -29,6 +29,7 @@ if (isset($_POST['login'])) {
             // set session dan arahkan ke halaman dashbaord jika username dan password benar
             $_SESSION['login'] = true;
             $_SESSION['nama_lengkap'] = $user['nama_lengkap'];
+            $_SESSION['id_user'] = $user['id_user'];
             $_SESSION['username'] = $user['username'];
             header('location: dashboard.php');
         } else {

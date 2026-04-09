@@ -109,7 +109,6 @@ $data_kategori = allData("SELECT * FROM kategori ORDER BY id_kategori DESC");
                             </ul>
                         </div>
                         <!-- Tools Dropdown end -->
-
                         <!-- account dropdown -->
                         <div class="dropdown mx-lg-4">
                             <a href="#" class="nav-link dropdown-toggle d-flex align-items-center" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
@@ -117,21 +116,19 @@ $data_kategori = allData("SELECT * FROM kategori ORDER BY id_kategori DESC");
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-3" aria-labelledby="userMenu">
                                 <li>
-                                    <h6 class="dropdown-header">Admin Profile</h6>
+                                    <h6 class="dropdown-header">User Profile</h6>
                                 </li>
-                                <li><a class="dropdown-item" href="kategori_lokasi.php"><i class="bi bi-person me-2"></i> Kategori & Lokasi</a></li>
+                                <li><a class="dropdown-item" href="profile.php"><i class="bi bi-person me-2"></i> Profile Saya</a></li>
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
-                                <li><a class="dropdown-item" href="#"><i class="bi bi-shield-lock me-2"></i> Ganti Password</a></li>
+                                <li><a class="dropdown-item" href="user.php"><i class="bi bi-person-add me-2"></i> Admin Terdaftar</a></li>
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
                             </ul>
                         </div>
                         <!-- account dropdown end -->
-
-
                         <a class="mx-0 mx-lg-5 log-styles" href="logout.php">
                             <i class="bi bi-box-arrow-right log-styles"></i> LOGOUT</a>
                     </div>
@@ -149,6 +146,14 @@ $data_kategori = allData("SELECT * FROM kategori ORDER BY id_kategori DESC");
                     <div class="col-6 col-lg-6 font-pagination">
                         <small class="m-0">Page</small>
                         <h5>Lokasi dan Kategori Aset</h5>
+                    </div>
+                    <div class="col-lg col-lg-6">
+                        <form action="search-result.php" method="get">
+                            <div class="input-group mt-2">
+                                <input type="text" name="keyword" class="form-control rounded-start-3" placeholder="Search" autocomplete="off">
+                                <button class="btn btn-search-styles  rounded-end-3" type="submit" id="submit"><i class="bi bi-search" style="font-size: 20px;"></i></button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>

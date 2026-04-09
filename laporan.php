@@ -92,18 +92,19 @@ $data_aset = allData("SELECT * FROM aset JOIN kategori ON aset.id_kategori = kat
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-3" aria-labelledby="userMenu">
                                 <li>
-                                    <h6 class="dropdown-header">Admin Profile</h6>
+                                    <h6 class="dropdown-header">User Profile</h6>
                                 </li>
-                                <li><a class="dropdown-item" href="kategori_lokasi.php"><i class="bi bi-person me-2"></i> Kategori & Lokasi</a></li>
+                                <li><a class="dropdown-item" href="profile.php"><i class="bi bi-person me-2"></i> Profile Saya</a></li>
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
-                                <li><a class="dropdown-item" href="#"><i class="bi bi-shield-lock me-2"></i> Ganti Password</a></li>
+                                <li><a class="dropdown-item" href="user.php"><i class="bi bi-person-add me-2"></i> Admin Terdaftar</a></li>
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
                             </ul>
                         </div>
+                        <!-- account dropdown end -->
 
                         <!-- account dropdown end -->
                         <a class="mx-0 mx-lg-5 log-styles" href="logout.php">
@@ -125,9 +126,9 @@ $data_aset = allData("SELECT * FROM aset JOIN kategori ON aset.id_kategori = kat
                         <h5>Laporan</h5>
                     </div>
                     <div class="col-lg col-lg-6">
-                        <form action="" method="post">
+                        <form action="search-result.php" method="get">
                             <div class="input-group mt-2">
-                                <input type="text" class="form-control fw-lighter rounded-start-3" placeholder="Search">
+                                <input type="text" name="keyword" class="form-control rounded-start-3" placeholder="Search" autocomplete="off">
                                 <button class="btn btn-search-styles  rounded-end-3" type="submit" id="submit"><i class="bi bi-search" style="font-size: 20px;"></i></button>
                             </div>
                         </form>
@@ -145,10 +146,10 @@ $data_aset = allData("SELECT * FROM aset JOIN kategori ON aset.id_kategori = kat
                         <div class="card-body d-flex justify-content-between align-items-center">
                             <h5 class="fw-bold mb-0">Laporan Inventaris Aset</h5>
                             <div class="btn-group">
-                                <a href="export_pdf.php" target="_blank" class="btn btn-danger btn-sm">
+                                <a href="export-pdf.php" target="_blank" class="btn btn-danger btn-sm">
                                     <i class="bi bi-file-earmark-pdf"></i> Export PDF
                                 </a>
-                                <a href="export_excel.php" target="_blank" class="btn btn-success btn-sm">
+                                <a href="export-excel.php" target="_blank" class="btn btn-success btn-sm">
                                     <i class="bi bi-file-earmark-excel"></i> Export Excel
                                 </a>
                             </div>
