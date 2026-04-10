@@ -16,10 +16,10 @@ body {
 /* login image style */
 .login-image {
   width: 100%;
-  height: 50vh;
-  background-image: url(../assets/img/login_page/login.jpg);
+  height: 61vh;
+  background-image: url(../assets/img/login_page/login.png);
   background-size: cover;
-  background-position: center;
+  background-position-y: -1px;
   background-repeat: no-repeat;
   border-radius: 0px 10px 10px 0px;
 }
