@@ -225,10 +225,6 @@ $data_user = allData("SELECT * FROM user ORDER BY id_user DESC");
                                     <td><?= $user['username'] ?></td>
                                     <td><span class="badge bg-success text-capitalize"><?= $user['role'] ?></span></td>
                                     <td class="text-center">
-                                        <!-- Ubah Data -->
-                                        <a href="profile.php" style="color: #14Ae5c;" class="text-decoration-none">
-                                            <i class="bi bi-pencil-fill me-3"></i>
-                                        </a>
                                         <!-- Hapus -->
                                         <a href="hapus-user.php?id=<?= $user['id_user'] ?>" class="text-decoration-none" style="color: #f24822;" onclick="return confirm('Yakin mau hapus Data User ini ?')">
                                             <i class="bi bi-trash3 me-3"></i>

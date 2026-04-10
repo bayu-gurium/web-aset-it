@@ -1,5 +1,4 @@
 <?php
-
 require 'database.php';
 
 // tampilkan semu data]
@@ -300,6 +299,43 @@ function tambahUser($data)
     return mysqli_affected_rows($db_connect);
 }
 
+// Ubah Nama User
+function ubahNamaUser($data)
+{
+
+    global $db_connect;
+
+    $nama_user = mysqli_real_escape_string($db_connect, $data['nama_lengkap']);
+    $id_user = $data['id_user'];
+
+    mysqli_query($db_connect, "UPDATE user SET nama_lengkap = '$nama_user' WHERE id_user = $id_user");
+
+    return mysqli_affected_rows($db_connect);
+}
+// Ubah Password
+function updatePassword($data)
+{
+
+    global $db_connect;
+
+    $password_baru = mysqli_real_escape_string($db_connect, $data['pass_baru']);
+    $konfirmasi_pass = mysqli_real_escape_string($db_connect, $data['konfirmasi_pass']);
+    $id_user = $data['id_user'];
+
+    // cek konfirmasi password
+    if ($password_baru !== $konfirmasi_pass) {
+        echo "<script>alert('Konfirmasi Password tidak sesuai!');</script>";
+        return false;
+    }
+
+    // hashsing password
+    $password_fix = password_hash($password_baru, PASSWORD_DEFAULT);
+
+    mysqli_query($db_connect, "UPDATE user SET password = '$password_fix' WHERE id_user = $id_user");
+
+    return mysqli_affected_rows($db_connect);
+}
+
 // Hapus user
 function hapusUser($id_user)
 {
@@ -308,4 +344,40 @@ function hapusUser($id_user)
 
     mysqli_query($db_connect, "DELETE FROM user WHERE id_user = $id_user");
     return mysqli_affected_rows($db_connect);
+}
+// Upload Foto Profile
+function uploadFotoProfile()
+{
+    $namaFile = $_FILES['foto_profile']['name'];
+    $ukuranFile = $_FILES['foto_profile']['size'];
+    $error = $_FILES['foto_profile']['error'];
+    $tmpName = $_FILES['foto_profile']['tmp_name'];
+
+    // 1. Cek apakah ada gambar yang diupload
+    if ($error === 4) {
+        return "no_file";
+    }
+
+    // 2. Validasi Ekstensi (Format)
+    $ekstensiValid = ['jpg', 'jpeg', 'png'];
+    $ekstensiFile = explode('.', $namaFile);
+    $ekstensiFile = strtolower(end($ekstensiFile));
+
+    if (!in_array($ekstensiFile, $ekstensiValid)) {
+        return "error_format";
+    }
+
+    // 3. Validasi Ukuran (Misal Max 2MB = 2.000.000 byte)
+    if ($ukuranFile > 5000000) {
+        return "error_size";
+    }
+
+    // 4. Lolos Validasi: Rename & Pindahkan
+    // Generate nama baru pakai uniqid() + ekstensi asli
+    $namaFileBaru = uniqid() . '.' . $ekstensiFile;
+
+    // Pindahkan file dari tmp ke folder tujuan
+    move_uploaded_file($tmpName, 'assets/img/profile_foto/' . $namaFileBaru);
+
+    return $namaFileBaru;
 }

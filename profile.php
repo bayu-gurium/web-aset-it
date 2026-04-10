@@ -13,6 +13,65 @@ $id_user = $_SESSION["id_user"];
 $user = mysqli_query($db_connect, "SELECT * FROM user WHERE id_user = $id_user");
 $u = mysqli_fetch_assoc($user);
 
+// simpan perubahan di klik
+if (isset($_POST['simpan_nama'])) {
+
+    if (ubahNamaUser($_POST) > 0) {
+        $suksess_update = true;
+    } else {
+        $error_update = true;
+    }
+}
+// Update Password
+if (isset($_POST['update_password'])) {
+    if (updatePassword($_POST) > 0) {
+
+        $sukkses_up_pass = true;
+    } else {
+        $error_up_pass = true;
+    }
+}
+// Ubah FotoProfile
+if (isset($_POST["update_foto"])) {
+    $id_user = $_POST["id_user"];
+    $foto_lama = $_POST["foto_lama"];
+
+    // Jalankan fungsi upload
+    $foto_baru = uploadFotoProfile();
+
+    // Cek respon dari fungsi upload
+    if ($foto_baru === "error_format") {
+        echo "<script>alert('Format file tidak didukung! Harus JPG/PNG.'); window.history.back();</script>";
+        exit;
+    } elseif ($foto_baru === "error_size") {
+        echo "<script>alert('Ukuran foto terlalu besar! Maksimal 2MB.'); window.history.back();</script>";
+        exit;
+    } elseif ($foto_baru === "no_file") {
+        echo "<script>alert('Pilih file foto dulu'); window.history.back();</script>";
+        exit;
+    } else {
+        // --- PROSES PENGHAPUSAN FOTO LAMA ---
+        // Kita hanya hapus jika fotonya BUKAN 'default.jpg' dan filenya beneran ada.
+        if ($foto_lama !== 'default.jpg') {
+            $path_foto_lama = 'assets/img/profile_foto/' . $foto_lama;
+            if (file_exists($path_foto_lama)) {
+                // Gunakan unlink() untuk hapus file
+                unlink($path_foto_lama);
+            }
+        }
+
+        // --- UPDATE DATABASE ---
+        mysqli_query($db_connect, "UPDATE user SET foto_profile = '$foto_baru' WHERE id_user = '$id_user'");
+
+        // Jika berhasil update (ada baris yang terpengaruh)
+        if (mysqli_affected_rows($db_connect) > 0) {
+            echo "<script>alert('Foto profile berhasil diperbarui!'); document.location.href='profile.php';</script>";
+        } else {
+            // Jika query gagal atau datanya sama (jarang terjadi karena unlink)
+            echo "<script>alert('Gagal memperbarui foto di database.'); document.location.href='profile.php';</script>";
+        }
+    }
+}
 
 ?>
 
@@ -23,7 +82,7 @@ $u = mysqli_fetch_assoc($user);
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Kelola User</title>
+    <title>User Profile</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <!-- font link -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -127,13 +186,13 @@ $u = mysqli_fetch_assoc($user);
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-primary text-white p-3">
+                    <div class="card-header p-3">
                         <h5 class="mb-0"><i class="bi bi-person-badge me-2"></i>Profile Saya</h5>
                     </div>
                     <div class="card-body p-5">
                         <div class="row align-items-center">
                             <div class="col-md-4 text-center mb-4">
-                                <img src="assets/img/profile_foto/profile.png"
+                                <img src="assets/img/profile_foto/<?= $u['foto_profile'] ?>"
                                     class="rounded-circle img-thumbnail shadow-sm"
                                     style="width: 150px; height: 150px; object-fit: cover;">
                                 <button class="btn btn-sm btn-outline-primary mt-3" data-bs-toggle="modal" data-bs-target="#modalGantiFoto">
@@ -141,8 +200,80 @@ $u = mysqli_fetch_assoc($user);
                                 </button>
                             </div>
 
+                            <!-- Modal Ganti foto  -->
+                            <div class="modal fade" id="modalGantiFoto" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <form action="" method="post" enctype="multipart/form-data">
+                                        <div class="modal-content border-0">
+                                            <div class="modal-header bg-primary text-white">
+                                                <h5 class="modal-title"><i class="bi bi-camera me-2"></i>Ganti Foto Profile</h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <input type="hidden" name="id_user" value="<?= $u['id_user']; ?>">
+                                                <input type="hidden" name="foto_lama" value="<?= $u['foto_profile']; ?>">
+
+                                                <div class="text-center mb-3">
+                                                    <img src="assets/img/profile_foto/<?= $u['foto_profile']; ?>" class="rounded-circle img-thumbnail" style="width: 100px; height: 100px; object-fit: cover;">
+                                                    <p class="text-muted small mt-2">Foto Saat Ini</p>
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">Pilih Foto Baru</label>
+                                                    <input type="file" name="foto_profile" class="form-control" accept="image/png, image/jpeg, image/jpg" required>
+                                                    <small class="text-muted italic">*Format: JPG, JPEG, PNG. Maks: 2MB.</small>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                                <button type="submit" name="update_foto" class="btn btn-primary px-4">
+                                                    <i class="bi bi-upload me-1"></i> Upload & Simpan
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <!-- Modal Ganti foto  -->
+
+
                             <div class="col-md-8">
-                                <form action="proses_update_profile.php" method="POST">
+                                <div class="row">
+                                    <div class="col-md">
+                                        <?php if (isset($suksess_update)) : ?>
+                                            <div class="alert alert-success p-2 border-0 alert-dismissible d-flex justify-content-between align-items-center px-3" role="alert">
+                                                <div>
+                                                    <strong>Berhasil !</strong> Nama User berhasil diubah.
+                                                </div>
+                                                <a href="" class="text-decoration-none text-success" data-bs-dismiss="alert" aria-label="Close">
+                                                    <i class="bi bi-x-lg"></i>
+                                                </a>
+                                            </div>
+                                        <?php endif ?>
+                                        <!-- alert update Password -->
+                                        <?php if (isset($sukkses_up_pass)) : ?>
+                                            <div class="alert alert-success p-2 border-0 alert-dismissible d-flex justify-content-between align-items-center px-3" role="alert">
+                                                <div>
+                                                    <strong>Berhasil !</strong> Password berhasil diubah!
+                                                </div>
+                                                <a href="" class="text-decoration-none text-success" data-bs-dismiss="alert" aria-label="Close">
+                                                    <i class="bi bi-x-lg"></i>
+                                                </a>
+                                            </div>
+                                        <?php endif ?>
+                                        <?php if (isset($error_up_pass)) : ?>
+                                            <div class="alert alert-danger p-2 border-0 alert-dismissible d-flex justify-content-between align-items-center px-3" role="alert">
+                                                <div>
+                                                    <strong>Gagal !</strong> Password Gagal diubah!
+                                                </div>
+                                                <a href="" class="text-decoration-none text-success" data-bs-dismiss="alert" aria-label="Close">
+                                                    <i class="bi bi-x-lg"></i>
+                                                </a>
+                                            </div>
+                                        <?php endif ?>
+                                    </div>
+                                </div>
+                                <form action="" method="post">
                                     <input type="hidden" name="id_user" value="<?= $u['id_user']; ?>">
 
                                     <div class="mb-3">
@@ -161,11 +292,41 @@ $u = mysqli_fetch_assoc($user);
                                         <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalGantiPassword">
                                             <i class="bi bi-key me-1"></i> Ganti Password
                                         </button>
-                                        <button type="submit" class="btn btn-primary px-4">
+                                        <button type="submit" class="btn btn-primary px-4" name="simpan_nama">
                                             <i class="bi bi-save me-1"></i> Simpan Perubahan
                                         </button>
                                     </div>
                                 </form>
+
+                                <!-- Modal Ganti Password -->
+                                <div class="modal fade" id="modalGantiPassword" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <form action="" method="post">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Ganti Password</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <input type="hidden" name="id_user" value="<?= $u['id_user']; ?>">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Password Baru</label>
+                                                        <input type="password" placeholder="Masukkan Password Baru" name="pass_baru" class="form-control" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Konfirmasi Password Baru</label>
+                                                        <input type="password" placeholder="Konfirmasi Password Baru" name="konfirmasi_pass" class="form-control" required>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="submit" name="update_password" class="btn btn-primary w-100">Update Password</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <!-- Modal Ganti Password -->
+
                             </div>
                         </div>
                     </div>
