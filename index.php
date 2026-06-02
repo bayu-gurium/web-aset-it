@@ -1,5 +1,12 @@
 <!-- Logic -->
+
 <?php
+
+require 'vendor/autoload.php'; // Penting!
+require './modul/database.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+
 session_start();
 require './modul/fuctions.php';
 // cek session
@@ -43,9 +50,7 @@ if (isset($_POST['login'])) {
 }
 
 ?>
-<!-- Logic end -->
 
-<!--  -->
 <!doctype html>
 <html lang="en">
 
@@ -86,6 +91,9 @@ if (isset($_POST['login'])) {
                                 </div>
                                 <button type="submit" name="login" class="btn btn-primary p-3 w-100 fw-bold" style="background-color: #3A4CCB; margin-top: 12px;">LOGIN</button>
                             </form>
+                            <div class="form-group text-center mt-3">
+                                <a href="lupa-password.php" class="text-muted">Lupa Password?</a>
+                            </div>
                         </div>
                         <div class="col-lg-6 d-none d-lg-block p-0">
                             <div class="login-image"></div>

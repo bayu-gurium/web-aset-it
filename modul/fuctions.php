@@ -1,5 +1,7 @@
 <?php
 require 'database.php';
+require 'vendor/autoload.php'; // Penting!
+use PHPMailer\PHPMailer\PHPMailer;
 
 // tampilkan semu data]
 function allData($query)
