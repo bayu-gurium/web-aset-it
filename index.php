@@ -77,8 +77,12 @@ if (isset($_POST['login'])) {
                         <div class="col-lg-6 p-5">
                             <form class="mx-4" action="" method="post">
                                 <!-- alert -->
-                                <?php if (isset($username_eror) || isset($password_eror)) : ?>
-                                    <div class="alert alert-danger p-2 px-2">Username / Password tidak sesuai !!</div>
+                                <?php if (isset($username_eror)): ?>
+                                    <div class="alert alert-danger p-2 px-2">Username tidak ditemukan !!</div>
+                                <?php endif ?>
+                                <!-- alert -->
+                                <?php if (isset($password_eror)): ?>
+                                    <div class="alert alert-danger p-2 px-2">Password tidak sesuai !!</div>
                                 <?php endif ?>
 
                                 <div class="mb-4">
