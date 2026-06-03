@@ -27,21 +27,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // 4. Kirim Email
         $mail = new PHPMailer(true);
         try {
+            // Pengaturan Server
             $mail->isSMTP();
-            $mail->Host       = 'sandbox.smtp.mailtrap.io';
+            $mail->Host       = 'smtp.gmail.com';
             $mail->SMTPAuth   = true;
-            $mail->Username   = '18829c17b005ba';
-            $mail->Password   = '728eeab6bc3b1a';
+            $mail->Username   = 'nbcode26@gmail.com'; // Email pengirim
+            $mail->Password   = 'qzoddobkgpxqejfa';  // 16 karakter App Password (TANPA SPASI)
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port       = 2525;
+            $mail->Port       = 587;
 
-            $mail->setFrom('it-support@bank-aset.com', 'Admin IT Aset');
+            $mail->setFrom('nbcode26@gmail.com', 'Admin IT Aset');
             $mail->addAddress($email);
             $mail->Subject = 'Reset Password Aset IT';
 
             // SESUAIKAN URL INI DENGAN PATH PROYEK LU!
-            $link = "http://localhost/aset_it/proses-reset-password.php?token=" . $token;
-            $mail->Body    = "Klik link ini untuk reset password: " . $link;
+            // $link = "http://localhost/aset_it/proses-reset-password.php?token=" . $token;
+            // $mail->Body    = "Klik link ini untuk reset password: " . $link;
+            // Konten Email
+            $mail->isHTML(true);
+            $mail->Subject = 'Reset Password Aset IT';
+            $mail->Body    = "Halo, klik link ini untuk reset password Anda: <br> 
+                     <a href='http://localhost/aset_it/proses-reset-password.php?token=$token'>Reset Sekarang</a>";
 
             $mail->send();
 

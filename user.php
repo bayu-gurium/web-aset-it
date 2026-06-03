@@ -138,7 +138,7 @@ $data_user = allData("SELECT * FROM user ORDER BY id_user DESC");
             <div class="col-md-8">
                 <div class="row">
                     <div class="col-lg text-end">
-                        <button class="btn btn-sm text-light mb-2" style="background-color: #3a4ccb;" type="button" data-bs-toggle="modal" data-bs-target="#tambahUser"> <i class="bi bi-plus-circle"></i> Tambah Aset</button>
+                        <button class="btn btn-sm text-light mb-2" style="background-color: #3a4ccb;" type="button" data-bs-toggle="modal" data-bs-target="#tambahUser"> <i class="bi bi-plus-circle"></i> Tambah User</button>
                         <!-- Modal Tambah User -->
                         <div class="modal fade" id="tambahUser" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="tambahUserLabel" aria-hidden="true">
                             <div class="modal-dialog">
@@ -157,6 +157,10 @@ $data_user = allData("SELECT * FROM user ORDER BY id_user DESC");
                                             <div class="mb-3">
                                                 <label for="">Username</label>
                                                 <input type="text" name="username" required class="form-control my-2" placeholder="Username" autofocus>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="">Email</label>
+                                                <input type="email" name="email" required class="form-control my-2" placeholder="Email" autofocus>
                                             </div>
                                             <div class="row">
                                                 <div class="col-6">

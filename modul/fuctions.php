@@ -277,6 +277,7 @@ function tambahUser($data)
     $password2 = mysqli_escape_string($db_connect, $data['password2']);
     $nama_lengkap = mysqli_escape_string($db_connect, $data['nama_lengkap']);
     $role = mysqli_escape_string($db_connect, $data['role']);
+    $email = mysqli_escape_string($db_connect, $data['email']);
     $foto_profile = "profile.png";
 
     // cek username
@@ -296,7 +297,7 @@ function tambahUser($data)
     $password_fix = password_hash($password, PASSWORD_DEFAULT);
 
 
-    mysqli_query($db_connect, "INSERT INTO user VALUES ('', '$username', '$password_fix', '$nama_lengkap', '$role', '$foto_profile') ");
+    mysqli_query($db_connect, "INSERT INTO user VALUES ('', '$username', '$email', '$password_fix', '$nama_lengkap', '$role', '$foto_profile') ");
 
     return mysqli_affected_rows($db_connect);
 }
