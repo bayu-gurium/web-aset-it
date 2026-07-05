@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 03, 2026 at 07:10 PM
+-- Generation Time: Jul 05, 2026 at 04:14 PM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.0.30
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -34,7 +34,7 @@ CREATE TABLE `aset` (
   `id_kategori` int(11) NOT NULL,
   `spesifikasi` text NOT NULL,
   `id_lokasi` int(11) NOT NULL,
-  `kondisi` enum('bagus','rusak ringan','rusak berat') NOT NULL,
+  `kondisi` enum('baik','rusak ringan','rusak berat') NOT NULL,
   `status` enum('aktif','cadangan','dihapuskan') NOT NULL,
   `tgl_perolehan` date NOT NULL,
   `keterangan` text NOT NULL,
@@ -52,6 +52,14 @@ CREATE TABLE `kategori` (
   `nama_kategori` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `kategori`
+--
+
+INSERT INTO `kategori` (`id_kategori`, `nama_kategori`) VALUES
+(7, 'Leptop'),
+(8, 'Router');
+
 -- --------------------------------------------------------
 
 --
@@ -63,6 +71,39 @@ CREATE TABLE `lokasi` (
   `nama_lokasi` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `lokasi`
+--
+
+INSERT INTO `lokasi` (`id_lokasi`, `nama_lokasi`) VALUES
+(33, 'Teller'),
+(34, 'SDM');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `password_resets`
+--
+
+CREATE TABLE `password_resets` (
+  `id` int(11) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `token` varchar(64) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `password_resets`
+--
+
+INSERT INTO `password_resets` (`id`, `email`, `token`, `created_at`) VALUES
+(15, 'bhentbayu@gmail.com', 'c3e1987466cc7818d90150b109f2ebd2022b8a44655791ada1dd5f93b13c7f80', '2026-06-02 10:03:48'),
+(17, 'bhentbayu@gmail.com', 'a8dd8064b23523855060f899696e2b1f1fea9a8416abd634836964deb1f53bd9', '2026-06-03 14:36:27'),
+(18, 'bhentbayu@gmail.com', '3c394159fe0be1bfdc14a34b929723152adaa889695e443b6056f33214887633', '2026-06-03 14:37:11'),
+(19, 'bhentbayu@gmail.com', '0afea2a90cdc1ed05110411a6b8691524c22c6b17707e281fb0ce4a4b17b1040', '2026-06-03 14:39:19'),
+(20, 'bhentbayu@gmail.com', '3d7591ff94776a03e007f3ee3d7139911822e564b291030d23f07c9a7637f88b', '2026-06-03 14:40:48'),
+(22, 'nbcode26@gmail.com', '18ea7c013db81be1a14d68489ab03b43c1d14c9e71f952c58822e9447f1cc645', '2026-06-03 17:41:24');
+
 -- --------------------------------------------------------
 
 --
@@ -72,17 +113,19 @@ CREATE TABLE `lokasi` (
 CREATE TABLE `user` (
   `id_user` int(10) UNSIGNED NOT NULL,
   `username` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `nama_lengkap` varchar(255) NOT NULL,
-  `role` enum('admin','staff') NOT NULL
+  `role` enum('admin','staff') NOT NULL,
+  `foto_profile` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `user`
 --
 
-INSERT INTO `user` (`id_user`, `username`, `password`, `nama_lengkap`, `role`) VALUES
-(1, 'Bayu', '$2y$10$etY1t4Azyiu5brBYdsaHg.9kGD6z.5AAvpj5.ZJPXo0KpOomqKh.G', 'Bayu Gurium', 'admin');
+INSERT INTO `user` (`id_user`, `username`, `email`, `password`, `nama_lengkap`, `role`, `foto_profile`) VALUES
+(2, 'Afi', 'afiproject80@gmail.com', '$2a$12$.FnHHCRiyViqqhtnZrlzJun16syeFEkZMZGTYKMlXNIwa7JkHZvV2', 'Affi', 'admin', 'profile.jpg');
 
 --
 -- Indexes for dumped tables
@@ -92,9 +135,7 @@ INSERT INTO `user` (`id_user`, `username`, `password`, `nama_lengkap`, `role`) V
 -- Indexes for table `aset`
 --
 ALTER TABLE `aset`
-  ADD PRIMARY KEY (`id_aset`),
-  ADD UNIQUE KEY `aset_id_kategori_unique` (`id_kategori`),
-  ADD UNIQUE KEY `aset_id_lokasi_unique` (`id_lokasi`);
+  ADD PRIMARY KEY (`id_aset`);
 
 --
 -- Indexes for table `kategori`
@@ -109,10 +150,17 @@ ALTER TABLE `lokasi`
   ADD PRIMARY KEY (`id_lokasi`);
 
 --
+-- Indexes for table `password_resets`
+--
+ALTER TABLE `password_resets`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `user`
 --
 ALTER TABLE `user`
-  ADD PRIMARY KEY (`id_user`);
+  ADD PRIMARY KEY (`id_user`),
+  ADD UNIQUE KEY `email` (`email`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -122,25 +170,31 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `aset`
 --
 ALTER TABLE `aset`
-  MODIFY `id_aset` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id_aset` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `kategori`
 --
 ALTER TABLE `kategori`
-  MODIFY `id_kategori` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id_kategori` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `lokasi`
 --
 ALTER TABLE `lokasi`
-  MODIFY `id_lokasi` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `id_lokasi` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+
+--
+-- AUTO_INCREMENT for table `password_resets`
+--
+ALTER TABLE `password_resets`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id_user` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_user` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
