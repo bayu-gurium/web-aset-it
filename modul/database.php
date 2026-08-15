@@ -4,7 +4,7 @@
 $host = "localhost";
 $user = "root";
 $pass = "";
-$db_name = "db_aset_it";
+$db_name = "aset_it";
 
 // connection
 $db_connect = mysqli_connect($host, $user, $pass, $db_name);

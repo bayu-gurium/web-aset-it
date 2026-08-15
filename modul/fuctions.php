@@ -51,7 +51,7 @@ function hapusLokasi($id_lokasi)
 }
 // -----------------------------------
 
-// Tambah Kategori
+// Tambah Kategori---------------------
 function tambahKategori($data)
 {
     global $db_connect;
@@ -266,6 +266,79 @@ function kondisiBaik()
     return $data['total'];
 }
 
+// Jumlah Aset Kondisi Rusak (Ringan + Berat) - butuh perhatian
+function jumlahAsetRusak()
+{
+    global $db_connect;
+    $result = mysqli_query($db_connect, "SELECT COUNT(*) AS total FROM aset WHERE kondisi IN ('rusak ringan', 'rusak berat')");
+    $data = mysqli_fetch_assoc($result);
+    return $data['total'];
+}
+
+// Distribusi Jumlah Aset per Kategori (untuk chart)
+function asetPerKategori()
+{
+    global $db_connect;
+    $query = "SELECT k.nama_kategori, COUNT(a.id_aset) AS jumlah
+              FROM kategori k
+              LEFT JOIN aset a ON a.id_kategori = k.id_kategori
+              GROUP BY k.id_kategori, k.nama_kategori
+              ORDER BY jumlah DESC";
+    return allData($query);
+}
+
+// Distribusi Jumlah Aset per Lokasi (untuk chart)
+function asetPerLokasi()
+{
+    global $db_connect;
+    $query = "SELECT l.nama_lokasi, COUNT(a.id_aset) AS jumlah
+              FROM lokasi l
+              LEFT JOIN aset a ON a.id_lokasi = l.id_lokasi
+              GROUP BY l.id_lokasi, l.nama_lokasi
+              ORDER BY jumlah DESC";
+    return allData($query);
+}
+
+// Distribusi Aset Berdasarkan Kondisi (untuk chart)
+function asetPerKondisi()
+{
+    global $db_connect;
+    $query = "SELECT kondisi, COUNT(*) AS jumlah FROM aset GROUP BY kondisi";
+    return allData($query);
+}
+
+// Daftar Aset yang Butuh Perhatian (kondisi rusak ringan/berat), untuk tabel actionable
+function asetPerluPerhatian($limit = 5)
+{
+    global $db_connect;
+    $limit = (int) $limit; // pastikan integer, aman dari SQL Injection
+    $query = "SELECT a.id_aset, a.kode_aset, a.nama_aset, a.kondisi, a.status,
+                     k.nama_kategori, l.nama_lokasi
+              FROM aset a
+              LEFT JOIN kategori k ON a.id_kategori = k.id_kategori
+              LEFT JOIN lokasi l ON a.id_lokasi = l.id_lokasi
+              WHERE a.kondisi IN ('rusak ringan', 'rusak berat')
+              ORDER BY FIELD(a.kondisi, 'rusak berat', 'rusak ringan'), a.id_aset DESC
+              LIMIT $limit";
+    return allData($query);
+}
+
+// Daftar Aset Terbaru yang Ditambahkan, untuk tabel aktivitas terbaru
+function asetTerbaru($limit = 5)
+{
+    global $db_connect;
+    $limit = (int) $limit; // pastikan integer, aman dari SQL Injection
+    $query = "SELECT a.id_aset, a.kode_aset, a.nama_aset, a.kondisi, a.status, a.tgl_perolehan,
+                     k.nama_kategori, l.nama_lokasi
+              FROM aset a
+              LEFT JOIN kategori k ON a.id_kategori = k.id_kategori
+              LEFT JOIN lokasi l ON a.id_lokasi = l.id_lokasi
+              ORDER BY a.id_aset DESC
+              LIMIT $limit";
+    return allData($query);
+}
+// -----------------------------------
+
 // Kelola Data User
 function tambahUser($data)
 {
@@ -315,6 +388,7 @@ function ubahNamaUser($data)
 
     return mysqli_affected_rows($db_connect);
 }
+
 // Ubah Password
 function updatePassword($data)
 {
@@ -348,6 +422,7 @@ function hapusUser($id_user)
     mysqli_query($db_connect, "DELETE FROM user WHERE id_user = $id_user");
     return mysqli_affected_rows($db_connect);
 }
+
 // Upload Foto Profile
 function uploadFotoProfile()
 {

@@ -93,22 +93,6 @@ $kodeOtomatis = $huruf . sprintf("%03s", $urutan);
         }
     }
 
-    // function previewImage2() {
-    //     const image = document.querySelector('#foto-aset2');
-    //     const imgPreview = document.querySelector('#img-preview2');
-    //     const textPreview = document.querySelector('#text-preview2');
-
-    //     // Munculkan tag gambar, sembunyikan teks placeholder
-    //     imgPreview.style.display = 'block';
-    //     textPreview.style.display = 'none';
-
-    //     const oFReader = new FileReader();
-    //     oFReader.readAsDataURL(image.files[0]);
-
-    //     oFReader.onload = function(oFREvent) {
-    //         imgPreview.src = oFREvent.target.result;
-    //     }
-    // }
 
     function previewUbah(id) {
         // Ambil elemen berdasarkan ID unik tadi
@@ -258,10 +242,10 @@ $kodeOtomatis = $huruf . sprintf("%03s", $urutan);
                                                             </div>
                                                             <div class="mb-3">
                                                                 <label for="lokasi" class="form-label">Lokasi</label>
-                                                                <select required class="form-select form-select mb-3" name="id_lokasi">
-                                                                    <option class="fw-light"> Pilih Lokasi </option>
+                                                                <select required class="form-select mb-3" name="id_lokasi">
+                                                                    <option value="" class="fw-light"> Pilih Lokasi </option>
                                                                     <?php foreach ($data_lokasi as $lokasi) : ?>
-                                                                        <option value=" <?= $lokasi['id_lokasi'] ?> "><?= $lokasi['nama_lokasi'] ?></option>
+                                                                        <option value="<?= $lokasi['id_lokasi'] ?>"><?= $lokasi['nama_lokasi'] ?></option>
                                                                     <?php endforeach ?>
                                                                 </select>
                                                             </div>
@@ -274,14 +258,13 @@ $kodeOtomatis = $huruf . sprintf("%03s", $urutan);
                                                                 </select>
                                                             </div>
                                                         </div>
-                                                        <!-- col-2 -->
                                                         <div class="col-md-5">
                                                             <div class="mb-3">
                                                                 <label for="katgory" class="form-label">Kategori Aset</label>
-                                                                <select class="form-select mb-3" name="id_kategori">
-                                                                    <option class="fw-light"> Pilih Kategori </option>
+                                                                <select class="form-select mb-3" name="id_kategori" required>
+                                                                    <option value="" class="fw-light"> Pilih Kategori </option>
                                                                     <?php foreach ($data_kategori as $kategori) : ?>
-                                                                        <option value="<?= $kategori['id_kategori'] ?>"><?= $kategori['nama_kategori']  ?></option>
+                                                                        <option value="<?= $kategori['id_kategori'] ?>"><?= $kategori['nama_kategori'] ?></option>
                                                                     <?php endforeach ?>
                                                                 </select>
                                                             </div>
@@ -386,13 +369,13 @@ $kodeOtomatis = $huruf . sprintf("%03s", $urutan);
                                                                 <div class="mb-3">
                                                                     <label for="kondisi" class="form-label">Kondisi</label>
                                                                     <select class="form-select mb-3 fw-semibold" name="kondisi">
-                                                                        <option value="Baik" <?= ($aset['kondisi'] == 'Baik') ? 'selected' : '' ?>>
+                                                                        <option value="baik" <?= ($aset['kondisi'] == 'baik') ? 'selected' : '' ?>>
                                                                             Baik
                                                                         </option>
-                                                                        <option value="Rusak Ringan" <?= ($aset['kondisi'] == 'Rusak Ringan') ? 'selected' : '' ?>>
+                                                                        <option value="rusak ringan" <?= ($aset['kondisi'] == 'rusak ringan') ? 'selected' : '' ?>>
                                                                             Rusak Ringan
                                                                         </option>
-                                                                        <option value="Rusak Berat" <?= ($aset['kondisi'] == 'Rusak Berat') ? 'selected' : '' ?>>
+                                                                        <option value="rusak berat" <?= ($aset['kondisi'] == 'rusak berat') ? 'selected' : '' ?>>
                                                                             Rusak Berat
                                                                         </option>
 
@@ -618,7 +601,7 @@ $kodeOtomatis = $huruf . sprintf("%03s", $urutan);
                                     </td>
                                     <td class=""><?= $aset['nama_lokasi'] ?>
                                     </td>
-                                    <td class="text-center"><?= $aset['kondisi'] ?>
+                                    <td class="text-center text-capitalize"><?= $aset['kondisi'] ?>
                                     </td>
                                     <td class="text-end">
                                         <!-- Ubah Data -->
